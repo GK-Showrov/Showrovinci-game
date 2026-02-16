@@ -45,6 +45,24 @@
             font-style: italic;
         }
 
+        .firebase-status {
+            text-align: center;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+        .firebase-status.connected {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .firebase-status.disconnected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
         .screen {
             display: none;
         }
@@ -361,6 +379,35 @@
             margin: 20px 0;
         }
 
+        .setup-instructions {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .setup-instructions h3 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .setup-instructions ol {
+            margin-left: 20px;
+        }
+
+        .setup-instructions li {
+            margin: 5px 0;
+            color: #856404;
+        }
+
+        .setup-instructions code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+
         @media (max-width: 768px) {
             .container {
                 padding: 20px;
@@ -383,10 +430,63 @@
 <body>
     <div class="container">
         <h1>🎭 ShowRovinci Show</h1>
-        <p class="subtitle">The Ultimate Multiplayer Trivia Experience</p>
+        <p class="subtitle">The Ultimate Multiplayer Trivia Experience - Firebase Edition</p>
+        
+        <div id="firebaseStatus" class="firebase-status disconnected">
+            ⚠️ Firebase Not Configured - Follow Setup Instructions Below
+        </div>
+
+        <!-- Setup Instructions Screen -->
+        <div id="setupScreen" class="screen active">
+            <div class="setup-instructions">
+                <h3>🔧 One-Time Firebase Setup Required (5 minutes)</h3>
+                <p><strong>To enable TRUE online multiplayer, you need to configure Firebase:</strong></p>
+                
+                <ol>
+                    <li><strong>Go to Firebase Console:</strong> <a href="https://console.firebase.google.com" target="_blank">console.firebase.google.com</a></li>
+                    <li><strong>Click "Add Project"</strong> or "Create a project"</li>
+                    <li><strong>Name it:</strong> "ShowRovinci" (or anything you like)</li>
+                    <li><strong>Disable Google Analytics</strong> (not needed) → Click "Create Project"</li>
+                    <li><strong>Wait for it to finish</strong> → Click "Continue"</li>
+                    <li><strong>In your project:</strong> Click the <strong>Web icon (&lt;/&gt;)</strong> to add a web app</li>
+                    <li><strong>Name it:</strong> "ShowRovinci Game" → Click "Register app"</li>
+                    <li><strong>Copy the Firebase config</strong> (you'll see <code>firebaseConfig = {...}</code>)</li>
+                    <li><strong>Click "Realtime Database"</strong> in left sidebar</li>
+                    <li><strong>Click "Create Database"</strong></li>
+                    <li><strong>Choose location:</strong> (pick closest to you)</li>
+                    <li><strong>Start in TEST MODE</strong> → Click "Enable"</li>
+                    <li><strong>Paste your config below</strong> and click "Connect to Firebase"</li>
+                </ol>
+            </div>
+
+            <div class="input-group">
+                <label>Paste Your Firebase Config Object Here:</label>
+                <textarea id="firebaseConfigInput" rows="10" placeholder='{
+  "apiKey": "YOUR_API_KEY",
+  "authDomain": "YOUR_PROJECT.firebaseapp.com",
+  "databaseURL": "https://YOUR_PROJECT.firebaseio.com",
+  "projectId": "YOUR_PROJECT_ID",
+  "storageBucket": "YOUR_PROJECT.appspot.com",
+  "messagingSenderId": "YOUR_SENDER_ID",
+  "appId": "YOUR_APP_ID"
+}'></textarea>
+            </div>
+            
+            <button class="btn btn-success" onclick="connectFirebase()">Connect to Firebase</button>
+            
+            <div style="margin-top: 20px; padding: 15px; background: #e7f3ff; border-radius: 8px;">
+                <p><strong>💡 Why Firebase?</strong></p>
+                <p>Firebase provides a free real-time database that syncs game data across all players instantly, enabling true online multiplayer!</p>
+                <p><strong>✅ Free for your use case</strong> (up to 100 simultaneous connections)</p>
+            </div>
+
+            <div style="margin-top: 20px; text-align: center;">
+                <button class="btn btn-dark" onclick="playSoloWithoutSetup()">Skip Setup - Play Solo Mode Only</button>
+            </div>
+        </div>
 
         <!-- Role Selection Screen -->
-        <div id="roleScreen" class="screen active">
+        <div id="roleScreen" class="screen">
             <div class="role-selection">
                 <div class="role-card" onclick="selectRole('host')">
                     <div class="role-icon">👨‍💼</div>
@@ -427,7 +527,7 @@
             <button class="btn btn-secondary" onclick="showScreen('roleScreen')">Back</button>
         </div>
 
-        <!-- Host Setup Screen -->
+        <!-- All other screens remain the same as before -->
         <div id="hostSetupScreen" class="screen">
             <h2>Host Setup</h2>
             <div class="input-group">
@@ -449,7 +549,6 @@
             <button class="btn btn-secondary" onclick="showScreen('roleScreen')">Back</button>
         </div>
 
-        <!-- Player Join Screen -->
         <div id="playerJoinScreen" class="screen">
             <h2>Join Game</h2>
             <div class="input-group">
@@ -464,7 +563,6 @@
             <button class="btn btn-secondary" onclick="showScreen('roleScreen')">Back</button>
         </div>
 
-        <!-- Host Lobby Screen -->
         <div id="hostLobbyScreen" class="screen">
             <h2>Game Lobby</h2>
             <div class="game-code" id="displayGameCode"></div>
@@ -476,7 +574,6 @@
             <button class="btn btn-success" onclick="startQuestionCreation()" id="startGameBtn" disabled>Create Questions</button>
         </div>
 
-        <!-- Question Creation Screen -->
         <div id="questionCreationScreen" class="screen">
             <h2>Create Questions</h2>
             <p>Topic: <span class="topic-badge" id="creationTopic"></span></p>
@@ -522,7 +619,6 @@
             <button class="btn btn-success" onclick="startGame()" id="startGameBtnFinal" disabled>Start Game (Min 5 questions)</button>
         </div>
 
-        <!-- Player Waiting Screen -->
         <div id="playerWaitingScreen" class="screen">
             <h2>Waiting for Game to Start</h2>
             <div class="waiting-message">⏳ Host is preparing questions...</div>
@@ -532,7 +628,6 @@
             </div>
         </div>
 
-        <!-- Game Play Screen (Host) -->
         <div id="hostGameScreen" class="screen">
             <h2>Question <span id="hostQuestionNumber">1</span></h2>
             <div class="question-display">
@@ -547,7 +642,6 @@
             <button class="btn btn-success" onclick="showResults()" id="showResultsBtn" style="display: none;">Show Results</button>
         </div>
 
-        <!-- Game Play Screen (Player) -->
         <div id="playerGameScreen" class="screen">
             <h2>Question <span id="playerQuestionNumber">1</span></h2>
             <div class="question-display">
@@ -558,7 +652,6 @@
             <div id="answerFeedback" style="text-align: center; margin-top: 20px; font-size: 1.5em; font-weight: bold;"></div>
         </div>
 
-        <!-- Solo Game Screen -->
         <div id="soloGameScreen" class="screen">
             <h2>Question <span id="soloQuestionNumber">1</span> of <span id="soloTotalQuestions">10</span></h2>
             <div class="topic-badge solo" id="soloTopicDisplay"></div>
@@ -571,7 +664,6 @@
             <div id="soloAnswerFeedback" style="text-align: center; margin-top: 20px; font-size: 1.5em; font-weight: bold;"></div>
         </div>
 
-        <!-- Results Screen -->
         <div id="resultsScreen" class="screen">
             <div class="trophy">🏆</div>
             <h2>Final Results</h2>
@@ -580,8 +672,12 @@
         </div>
     </div>
 
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
     <script>
-        // Dark and funny questions database
+        // Dark questions database (same as before)
         const darkQuestions = {
             existential: [
                 {
@@ -845,6 +941,10 @@
             ]
         };
 
+        // Firebase and game state
+        let db = null;
+        let firebaseInitialized = false;
+        
         let gameState = {
             role: null,
             gameCode: null,
@@ -858,16 +958,48 @@
             timer: null,
             timeLeft: 15,
             soloScore: 0,
-            soloMode: false
+            soloMode: false,
+            listeners: []
         };
 
-        function getGames() {
-            const games = localStorage.getItem('showrovinciGames');
-            return games ? JSON.parse(games) : {};
+        function connectFirebase() {
+            const configInput = document.getElementById('firebaseConfigInput').value.trim();
+            
+            if (!configInput) {
+                alert('Please paste your Firebase config');
+                return;
+            }
+
+            try {
+                const firebaseConfig = JSON.parse(configInput);
+                
+                // Initialize Firebase
+                if (!firebase.apps.length) {
+                    firebase.initializeApp(firebaseConfig);
+                }
+                
+                db = firebase.database();
+                firebaseInitialized = true;
+                
+                // Update status
+                const statusEl = document.getElementById('firebaseStatus');
+                statusEl.className = 'firebase-status connected';
+                statusEl.textContent = '✅ Connected to Firebase - Online Multiplayer Ready!';
+                
+                // Save config to localStorage for next time
+                localStorage.setItem('firebaseConfig', configInput);
+                
+                // Show role screen
+                showScreen('roleScreen');
+                
+            } catch (error) {
+                alert('Error connecting to Firebase. Please check your config:\n' + error.message);
+                console.error('Firebase Error:', error);
+            }
         }
 
-        function saveGames(games) {
-            localStorage.setItem('showrovinciGames', JSON.stringify(games));
+        function playSoloWithoutSetup() {
+            showScreen('roleScreen');
         }
 
         function showScreen(screenId) {
@@ -876,6 +1008,12 @@
         }
 
         function selectRole(role) {
+            if (role !== 'solo' && !firebaseInitialized) {
+                alert('Please connect to Firebase first for multiplayer features!');
+                showScreen('setupScreen');
+                return;
+            }
+            
             gameState.role = role;
             if (role === 'host') {
                 showScreen('hostSetupScreen');
@@ -890,6 +1028,426 @@
             return Math.floor(100000 + Math.random() * 900000).toString();
         }
 
+        function createGame() {
+            const hostName = document.getElementById('hostName').value.trim();
+            const topic = document.getElementById('gameTopic').value.trim();
+            const maxPlayers = parseInt(document.getElementById('maxPlayers').value);
+
+            if (!hostName || !topic) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            gameState.hostName = hostName;
+            gameState.topic = topic;
+            gameState.maxPlayers = maxPlayers;
+            gameState.gameCode = generateGameCode();
+
+            // Create game in Firebase
+            db.ref('games/' + gameState.gameCode).set({
+                host: hostName,
+                topic: topic,
+                maxPlayers: maxPlayers,
+                players: [],
+                questions: [],
+                started: false,
+                currentQuestion: 0,
+                timestamp: Date.now()
+            }).then(() => {
+                document.getElementById('displayGameCode').textContent = gameState.gameCode;
+                document.getElementById('displayTopic').textContent = topic;
+                document.getElementById('maxPlayerCount').textContent = maxPlayers;
+
+                showScreen('hostLobbyScreen');
+                listenToLobby();
+            }).catch(error => {
+                alert('Error creating game: ' + error.message);
+            });
+        }
+
+        function listenToLobby() {
+            const gameRef = db.ref('games/' + gameState.gameCode);
+            
+            const listener = gameRef.on('value', (snapshot) => {
+                const game = snapshot.val();
+                if (!game) return;
+
+                gameState.players = game.players || [];
+                
+                document.getElementById('playerCount').textContent = gameState.players.length;
+                document.getElementById('lobbyPlayersList').innerHTML = gameState.players.map(p => `
+                    <div class="player-item">
+                        <span class="player-name">🎮 ${p.name}</span>
+                        <span style="color: #43e97b;">✓ Ready</span>
+                    </div>
+                `).join('');
+
+                document.getElementById('startGameBtn').disabled = gameState.players.length < 2;
+            });
+            
+            gameState.listeners.push({ ref: gameRef, listener });
+        }
+
+        function joinGame() {
+            const playerName = document.getElementById('playerName').value.trim();
+            const gameCode = document.getElementById('gameCode').value.trim();
+
+            if (!playerName || !gameCode) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            const gameRef = db.ref('games/' + gameCode);
+            
+            gameRef.once('value').then((snapshot) => {
+                const game = snapshot.val();
+                
+                if (!game) {
+                    alert('Game not found. Please check the code.');
+                    return;
+                }
+
+                if (game.players && game.players.length >= game.maxPlayers) {
+                    alert('Game is full!');
+                    return;
+                }
+
+                if (game.started) {
+                    alert('Game already started!');
+                    return;
+                }
+
+                if (game.players && game.players.some(p => p.name === playerName)) {
+                    alert('Name already taken!');
+                    return;
+                }
+
+                gameState.playerName = playerName;
+                gameState.gameCode = gameCode;
+                gameState.topic = game.topic;
+
+                // Add player to game
+                const players = game.players || [];
+                players.push({
+                    name: playerName,
+                    score: 0,
+                    answers: []
+                });
+
+                gameRef.update({ players }).then(() => {
+                    showScreen('playerWaitingScreen');
+                    listenToPlayerWaiting();
+                });
+            });
+        }
+
+        function listenToPlayerWaiting() {
+            const gameRef = db.ref('games/' + gameState.gameCode);
+            
+            const listener = gameRef.on('value', (snapshot) => {
+                const game = snapshot.val();
+                if (!game) return;
+
+                gameState.players = game.players || [];
+                
+                document.getElementById('waitingPlayersList').innerHTML = gameState.players.map(p => `
+                    <div class="player-item">
+                        <span class="player-name">🎮 ${p.name}</span>
+                    </div>
+                `).join('');
+
+                if (game.started && game.questions && game.questions.length > 0) {
+                    gameState.questions = game.questions;
+                    gameState.currentQuestion = game.currentQuestion || 0;
+                    
+                    // Remove this listener
+                    gameRef.off('value', listener);
+                    
+                    showPlayerQuestion();
+                }
+            });
+            
+            gameState.listeners.push({ ref: gameRef, listener });
+        }
+
+        function startQuestionCreation() {
+            document.getElementById('creationTopic').textContent = gameState.topic;
+            showScreen('questionCreationScreen');
+        }
+
+        function addQuestion() {
+            const questionText = document.getElementById('questionText').value.trim();
+            const options = [
+                document.getElementById('option0').value.trim(),
+                document.getElementById('option1').value.trim(),
+                document.getElementById('option2').value.trim(),
+                document.getElementById('option3').value.trim()
+            ];
+            
+            const correctAnswer = document.querySelector('input[name="correctAnswer"]:checked');
+
+            if (!questionText || options.some(o => !o) || !correctAnswer) {
+                alert('Please fill all fields and select correct answer');
+                return;
+            }
+
+            gameState.questions.push({
+                question: questionText,
+                options: options,
+                correct: parseInt(correctAnswer.value)
+            });
+            
+            // Update in Firebase
+            db.ref('games/' + gameState.gameCode + '/questions').set(gameState.questions);
+
+            document.getElementById('questionText').value = '';
+            document.getElementById('option0').value = '';
+            document.getElementById('option1').value = '';
+            document.getElementById('option2').value = '';
+            document.getElementById('option3').value = '';
+            document.querySelectorAll('input[name="correctAnswer"]').forEach(r => r.checked = false);
+
+            updateQuestionsDisplay();
+        }
+
+        function updateQuestionsDisplay() {
+            document.getElementById('questionCount').textContent = gameState.questions.length;
+            document.getElementById('questionsDisplay').innerHTML = gameState.questions.map((q, i) => `
+                <div class="question-item">
+                    <strong>Q${i + 1}:</strong> ${q.question}<br>
+                    <small>Correct: ${q.options[q.correct]}</small>
+                </div>
+            `).join('');
+
+            document.getElementById('startGameBtnFinal').disabled = gameState.questions.length < 5;
+        }
+
+        function startGame() {
+            if (gameState.questions.length < 5) {
+                alert('Need at least 5 questions');
+                return;
+            }
+
+            db.ref('games/' + gameState.gameCode).update({
+                started: true,
+                currentQuestion: 0
+            }).then(() => {
+                gameState.currentQuestion = 0;
+                showHostQuestion();
+            });
+        }
+
+        function showHostQuestion() {
+            const question = gameState.questions[gameState.currentQuestion];
+            document.getElementById('hostQuestionNumber').textContent = gameState.currentQuestion + 1;
+            document.getElementById('hostQuestionText').textContent = question.question;
+            document.getElementById('nextQuestionBtn').style.display = 'none';
+            document.getElementById('showResultsBtn').style.display = 'none';
+            
+            showScreen('hostGameScreen');
+            startTimer('host');
+            listenToPlayerAnswers();
+        }
+
+        function listenToPlayerAnswers() {
+            const gameRef = db.ref('games/' + gameState.gameCode + '/players');
+            
+            const checkAnswers = () => {
+                gameRef.once('value').then((snapshot) => {
+                    const players = snapshot.val() || [];
+                    
+                    const allAnswered = players.every(p => 
+                        p.answers && p.answers.some(a => a.question === gameState.currentQuestion)
+                    );
+
+                    document.getElementById('hostAnswersDisplay').innerHTML = players.map(p => {
+                        const answered = p.answers && p.answers.some(a => a.question === gameState.currentQuestion);
+                        return `
+                            <div class="player-item">
+                                <span class="player-name">${p.name}</span>
+                                <span>${answered ? '✅ Answered' : '⏳ Thinking...'}</span>
+                            </div>
+                        `;
+                    }).join('');
+
+                    if (allAnswered || gameState.timeLeft <= 0) {
+                        clearInterval(gameState.timer);
+                        setTimeout(() => {
+                            if (gameState.currentQuestion < gameState.questions.length - 1) {
+                                document.getElementById('nextQuestionBtn').style.display = 'block';
+                            } else {
+                                document.getElementById('showResultsBtn').style.display = 'block';
+                            }
+                        }, 1000);
+                    } else {
+                        setTimeout(checkAnswers, 500);
+                    }
+                });
+            };
+            
+            checkAnswers();
+        }
+
+        function showPlayerQuestion() {
+            const question = gameState.questions[gameState.currentQuestion];
+            document.getElementById('playerQuestionNumber').textContent = gameState.currentQuestion + 1;
+            document.getElementById('playerQuestionText').textContent = question.question;
+            document.getElementById('answerFeedback').innerHTML = '';
+            
+            document.getElementById('playerOptions').innerHTML = question.options.map((opt, i) => `
+                <button class="option-btn" onclick="selectAnswer(${i})">${opt}</button>
+            `).join('');
+
+            showScreen('playerGameScreen');
+            startTimer('player');
+            
+            // Listen for next question
+            listenForNextQuestion();
+        }
+
+        function listenForNextQuestion() {
+            const gameRef = db.ref('games/' + gameState.gameCode + '/currentQuestion');
+            
+            const listener = gameRef.on('value', (snapshot) => {
+                const currentQ = snapshot.val();
+                
+                if (currentQ > gameState.currentQuestion) {
+                    gameRef.off('value', listener);
+                    gameState.currentQuestion = currentQ;
+                    
+                    if (gameState.currentQuestion < gameState.questions.length) {
+                        setTimeout(() => showPlayerQuestion(), 100);
+                    } else {
+                        showPlayerResults();
+                    }
+                }
+            });
+        }
+
+        function selectAnswer(optionIndex) {
+            clearInterval(gameState.timer);
+            
+            const question = gameState.questions[gameState.currentQuestion];
+            const correct = optionIndex === question.correct;
+            
+            const answer = {
+                question: gameState.currentQuestion,
+                answer: optionIndex,
+                correct: correct,
+                time: gameState.timeLeft,
+                points: correct ? (100 + (gameState.timeLeft * 10)) : 0
+            };
+
+            // Find player and update their answers
+            db.ref('games/' + gameState.gameCode + '/players').once('value').then((snapshot) => {
+                const players = snapshot.val() || [];
+                const playerIndex = players.findIndex(p => p.name === gameState.playerName);
+                
+                if (playerIndex !== -1) {
+                    if (!players[playerIndex].answers) {
+                        players[playerIndex].answers = [];
+                    }
+                    
+                    // Check if already answered
+                    if (players[playerIndex].answers.some(a => a.question === gameState.currentQuestion)) {
+                        return;
+                    }
+                    
+                    players[playerIndex].answers.push(answer);
+                    players[playerIndex].score = (players[playerIndex].score || 0) + answer.points;
+                    
+                    db.ref('games/' + gameState.gameCode + '/players').set(players);
+                }
+            });
+
+            const buttons = document.querySelectorAll('.option-btn');
+            buttons.forEach((btn, i) => {
+                btn.disabled = true;
+                if (i === question.correct) {
+                    btn.classList.add('correct');
+                } else if (i === optionIndex && !correct) {
+                    btn.classList.add('incorrect');
+                }
+            });
+
+            document.getElementById('answerFeedback').innerHTML = correct 
+                ? `✅ Correct! +${answer.points} points`
+                : (optionIndex === -1 ? '⏱️ Time\'s up!' : '❌ Incorrect!');
+        }
+
+        function nextQuestion() {
+            gameState.currentQuestion++;
+            
+            db.ref('games/' + gameState.gameCode + '/currentQuestion').set(gameState.currentQuestion).then(() => {
+                showHostQuestion();
+            });
+        }
+
+        function showResults() {
+            db.ref('games/' + gameState.gameCode + '/players').once('value').then((snapshot) => {
+                const players = snapshot.val() || [];
+                const sortedPlayers = [...players].sort((a, b) => (b.score || 0) - (a.score || 0));
+                
+                document.getElementById('finalScoreboard').innerHTML = sortedPlayers.map((p, i) => {
+                    const medals = ['🥇', '🥈', '🥉'];
+                    return `
+                        <div class="scoreboard-item">
+                            <span class="rank">${medals[i] || ''} #${i + 1}</span>
+                            <span class="player-name">${p.name}</span>
+                            <span class="player-score">${p.score || 0} pts</span>
+                        </div>
+                    `;
+                }).join('');
+
+                showScreen('resultsScreen');
+            });
+        }
+
+        function showPlayerResults() {
+            const checkFinished = setInterval(() => {
+                db.ref('games/' + gameState.gameCode + '/players').once('value').then((snapshot) => {
+                    const players = snapshot.val() || [];
+                    
+                    const allFinished = players.every(p => 
+                        p.answers && p.answers.length >= gameState.questions.length
+                    );
+                    
+                    if (allFinished) {
+                        clearInterval(checkFinished);
+                        showResults();
+                    }
+                });
+            }, 1000);
+        }
+
+        function startTimer(role) {
+            gameState.timeLeft = 15;
+            const timerElement = document.getElementById(role + 'Timer');
+            
+            clearInterval(gameState.timer);
+            gameState.timer = setInterval(() => {
+                gameState.timeLeft--;
+                timerElement.textContent = gameState.timeLeft;
+                
+                if (gameState.timeLeft <= 5) {
+                    timerElement.classList.add('warning');
+                } else {
+                    timerElement.classList.remove('warning');
+                }
+                
+                if (gameState.timeLeft <= 0) {
+                    clearInterval(gameState.timer);
+                    if (role === 'player') {
+                        selectAnswer(-1);
+                    }
+                    if (role === 'solo') {
+                        selectSoloAnswer(-1);
+                    }
+                }
+            }, 1000);
+        }
+
+        // Solo mode functions (same as before)
         function startSoloGame() {
             const playerName = document.getElementById('soloPlayerName').value.trim();
             const topic = document.getElementById('soloTopic').value;
@@ -975,7 +1533,7 @@
 
         function showSoloResults() {
             const scoreboard = document.getElementById('finalScoreboard');
-            const maxScore = gameState.questions.length * 250; // Max possible score
+            const maxScore = gameState.questions.length * 250;
             const percentage = Math.round((gameState.soloScore / maxScore) * 100);
             
             let message = '';
@@ -1000,401 +1558,22 @@
             showScreen('resultsScreen');
         }
 
-        function createGame() {
-            const hostName = document.getElementById('hostName').value.trim();
-            const topic = document.getElementById('gameTopic').value.trim();
-            const maxPlayers = parseInt(document.getElementById('maxPlayers').value);
-
-            if (!hostName || !topic) {
-                alert('Please fill in all fields');
-                return;
+        // Check for saved config on load
+        window.addEventListener('load', () => {
+            const savedConfig = localStorage.getItem('firebaseConfig');
+            if (savedConfig) {
+                document.getElementById('firebaseConfigInput').value = savedConfig;
+                // Auto-connect
+                connectFirebase();
             }
+        });
 
-            gameState.hostName = hostName;
-            gameState.topic = topic;
-            gameState.maxPlayers = maxPlayers;
-            gameState.gameCode = generateGameCode();
-
-            const games = getGames();
-            games[gameState.gameCode] = {
-                host: hostName,
-                topic: topic,
-                maxPlayers: maxPlayers,
-                players: [],
-                questions: [],
-                started: false,
-                currentQuestion: 0
-            };
-            saveGames(games);
-
-            document.getElementById('displayGameCode').textContent = gameState.gameCode;
-            document.getElementById('displayTopic').textContent = topic;
-            document.getElementById('maxPlayerCount').textContent = maxPlayers;
-
-            showScreen('hostLobbyScreen');
-            updateLobby();
-        }
-
-        function joinGame() {
-            const playerName = document.getElementById('playerName').value.trim();
-            const gameCode = document.getElementById('gameCode').value.trim();
-
-            if (!playerName || !gameCode) {
-                alert('Please fill in all fields');
-                return;
-            }
-
-            const games = getGames();
-            const game = games[gameCode];
-            
-            if (!game) {
-                alert('Game not found');
-                return;
-            }
-
-            if (game.players.length >= game.maxPlayers) {
-                alert('Game is full!');
-                return;
-            }
-
-            if (game.started) {
-                alert('Game already started!');
-                return;
-            }
-
-            if (game.players.some(p => p.name === playerName)) {
-                alert('Name already taken!');
-                return;
-            }
-
-            gameState.playerName = playerName;
-            gameState.gameCode = gameCode;
-            gameState.topic = game.topic;
-
-            game.players.push({
-                name: playerName,
-                score: 0,
-                answers: []
+        // Cleanup listeners on page unload
+        window.addEventListener('beforeunload', () => {
+            gameState.listeners.forEach(({ ref, listener }) => {
+                ref.off('value', listener);
             });
-            saveGames(games);
-
-            showScreen('playerWaitingScreen');
-            updatePlayerWaiting();
-        }
-
-        function updateLobby() {
-            const games = getGames();
-            const game = games[gameState.gameCode];
-            
-            if (!game) return;
-            
-            document.getElementById('playerCount').textContent = game.players.length;
-            document.getElementById('lobbyPlayersList').innerHTML = game.players.map(p => `
-                <div class="player-item">
-                    <span class="player-name">🎮 ${p.name}</span>
-                    <span style="color: #43e97b;">✓ Ready</span>
-                </div>
-            `).join('');
-
-            document.getElementById('startGameBtn').disabled = game.players.length < 2;
-
-            if (!game.started) {
-                setTimeout(updateLobby, 1000);
-            }
-        }
-
-        function updatePlayerWaiting() {
-            const games = getGames();
-            const game = games[gameState.gameCode];
-            
-            if (!game) return;
-            
-            document.getElementById('waitingPlayersList').innerHTML = game.players.map(p => `
-                <div class="player-item">
-                    <span class="player-name">🎮 ${p.name}</span>
-                </div>
-            `).join('');
-
-            if (game.started && game.questions.length > 0) {
-                gameState.questions = game.questions;
-                gameState.currentQuestion = game.currentQuestion;
-                showPlayerQuestion();
-            } else {
-                setTimeout(updatePlayerWaiting, 1000);
-            }
-        }
-
-        function startQuestionCreation() {
-            document.getElementById('creationTopic').textContent = gameState.topic;
-            showScreen('questionCreationScreen');
-        }
-
-        function addQuestion() {
-            const questionText = document.getElementById('questionText').value.trim();
-            const options = [
-                document.getElementById('option0').value.trim(),
-                document.getElementById('option1').value.trim(),
-                document.getElementById('option2').value.trim(),
-                document.getElementById('option3').value.trim()
-            ];
-            
-            const correctAnswer = document.querySelector('input[name="correctAnswer"]:checked');
-
-            if (!questionText || options.some(o => !o) || !correctAnswer) {
-                alert('Please fill all fields and select correct answer');
-                return;
-            }
-
-            gameState.questions.push({
-                question: questionText,
-                options: options,
-                correct: parseInt(correctAnswer.value)
-            });
-            
-            const games = getGames();
-            games[gameState.gameCode].questions = gameState.questions;
-            saveGames(games);
-
-            document.getElementById('questionText').value = '';
-            document.getElementById('option0').value = '';
-            document.getElementById('option1').value = '';
-            document.getElementById('option2').value = '';
-            document.getElementById('option3').value = '';
-            document.querySelectorAll('input[name="correctAnswer"]').forEach(r => r.checked = false);
-
-            updateQuestionsDisplay();
-        }
-
-        function updateQuestionsDisplay() {
-            document.getElementById('questionCount').textContent = gameState.questions.length;
-            document.getElementById('questionsDisplay').innerHTML = gameState.questions.map((q, i) => `
-                <div class="question-item">
-                    <strong>Q${i + 1}:</strong> ${q.question}<br>
-                    <small>Correct: ${q.options[q.correct]}</small>
-                </div>
-            `).join('');
-
-            document.getElementById('startGameBtnFinal').disabled = gameState.questions.length < 5;
-        }
-
-        function startGame() {
-            if (gameState.questions.length < 5) {
-                alert('Need at least 5 questions');
-                return;
-            }
-
-            const games = getGames();
-            games[gameState.gameCode].started = true;
-            games[gameState.gameCode].currentQuestion = 0;
-            saveGames(games);
-            
-            gameState.currentQuestion = 0;
-            showHostQuestion();
-        }
-
-        function showHostQuestion() {
-            const question = gameState.questions[gameState.currentQuestion];
-            document.getElementById('hostQuestionNumber').textContent = gameState.currentQuestion + 1;
-            document.getElementById('hostQuestionText').textContent = question.question;
-            document.getElementById('nextQuestionBtn').style.display = 'none';
-            document.getElementById('showResultsBtn').style.display = 'none';
-            
-            showScreen('hostGameScreen');
-            startTimer('host');
-            monitorPlayerAnswers();
-        }
-
-        function showPlayerQuestion() {
-            const question = gameState.questions[gameState.currentQuestion];
-            document.getElementById('playerQuestionNumber').textContent = gameState.currentQuestion + 1;
-            document.getElementById('playerQuestionText').textContent = question.question;
-            document.getElementById('answerFeedback').innerHTML = '';
-            
-            document.getElementById('playerOptions').innerHTML = question.options.map((opt, i) => `
-                <button class="option-btn" onclick="selectAnswer(${i})">${opt}</button>
-            `).join('');
-
-            showScreen('playerGameScreen');
-            startTimer('player');
-        }
-
-        function startTimer(role) {
-            gameState.timeLeft = 15;
-            const timerElement = document.getElementById(role + 'Timer');
-            
-            clearInterval(gameState.timer);
-            gameState.timer = setInterval(() => {
-                gameState.timeLeft--;
-                timerElement.textContent = gameState.timeLeft;
-                
-                if (gameState.timeLeft <= 5) {
-                    timerElement.classList.add('warning');
-                } else {
-                    timerElement.classList.remove('warning');
-                }
-                
-                if (gameState.timeLeft <= 0) {
-                    clearInterval(gameState.timer);
-                    if (role === 'player') {
-                        const games = getGames();
-                        const game = games[gameState.gameCode];
-                        const player = game.players.find(p => p.name === gameState.playerName);
-                        
-                        if (!player.answers.some(a => a.question === gameState.currentQuestion)) {
-                            selectAnswer(-1);
-                        }
-                    }
-                    if (role === 'solo') {
-                        selectSoloAnswer(-1);
-                    }
-                }
-            }, 1000);
-        }
-
-        function selectAnswer(optionIndex) {
-            clearInterval(gameState.timer);
-            
-            const question = gameState.questions[gameState.currentQuestion];
-            const correct = optionIndex === question.correct;
-            
-            const games = getGames();
-            const game = games[gameState.gameCode];
-            const player = game.players.find(p => p.name === gameState.playerName);
-            
-            if (player.answers.some(a => a.question === gameState.currentQuestion)) {
-                return;
-            }
-            
-            player.answers.push({
-                question: gameState.currentQuestion,
-                answer: optionIndex,
-                correct: correct,
-                time: gameState.timeLeft
-            });
-            
-            if (correct) {
-                player.score += 100 + (gameState.timeLeft * 10);
-            }
-            
-            saveGames(games);
-
-            const buttons = document.querySelectorAll('.option-btn');
-            buttons.forEach((btn, i) => {
-                btn.disabled = true;
-                if (i === question.correct) {
-                    btn.classList.add('correct');
-                } else if (i === optionIndex && !correct) {
-                    btn.classList.add('incorrect');
-                }
-            });
-
-            document.getElementById('answerFeedback').innerHTML = correct 
-                ? `✅ Correct! +${100 + (gameState.timeLeft * 10)} points`
-                : (optionIndex === -1 ? '⏱️ Time\'s up!' : '❌ Incorrect!');
-
-            setTimeout(checkNextQuestion, 3000);
-        }
-
-        function checkNextQuestion() {
-            const games = getGames();
-            const game = games[gameState.gameCode];
-            
-            if (game.currentQuestion > gameState.currentQuestion) {
-                gameState.currentQuestion = game.currentQuestion;
-                if (gameState.currentQuestion < gameState.questions.length) {
-                    showPlayerQuestion();
-                } else {
-                    showPlayerResults();
-                }
-            } else {
-                setTimeout(checkNextQuestion, 1000);
-            }
-        }
-
-        function monitorPlayerAnswers() {
-            const games = getGames();
-            const game = games[gameState.gameCode];
-            
-            if (!game) return;
-            
-            const allAnswered = game.players.every(p => 
-                p.answers.some(a => a.question === gameState.currentQuestion)
-            );
-
-            document.getElementById('hostAnswersDisplay').innerHTML = game.players.map(p => {
-                const answered = p.answers.some(a => a.question === gameState.currentQuestion);
-                return `
-                    <div class="player-item">
-                        <span class="player-name">${p.name}</span>
-                        <span>${answered ? '✅ Answered' : '⏳ Thinking...'}</span>
-                    </div>
-                `;
-            }).join('');
-
-            if (allAnswered || gameState.timeLeft <= 0) {
-                clearInterval(gameState.timer);
-                setTimeout(() => {
-                    if (gameState.currentQuestion < gameState.questions.length - 1) {
-                        document.getElementById('nextQuestionBtn').style.display = 'block';
-                    } else {
-                        document.getElementById('showResultsBtn').style.display = 'block';
-                    }
-                }, 1000);
-            } else {
-                setTimeout(monitorPlayerAnswers, 500);
-            }
-        }
-
-        function nextQuestion() {
-            gameState.currentQuestion++;
-            
-            const games = getGames();
-            games[gameState.gameCode].currentQuestion = gameState.currentQuestion;
-            saveGames(games);
-            
-            showHostQuestion();
-        }
-
-        function showResults() {
-            const games = getGames();
-            const game = games[gameState.gameCode];
-            
-            const sortedPlayers = [...game.players].sort((a, b) => b.score - a.score);
-            
-            document.getElementById('finalScoreboard').innerHTML = sortedPlayers.map((p, i) => {
-                const medals = ['🥇', '🥈', '🥉'];
-                return `
-                    <div class="scoreboard-item">
-                        <span class="rank">${medals[i] || ''} #${i + 1}</span>
-                        <span class="player-name">${p.name}</span>
-                        <span class="player-score">${p.score} pts</span>
-                    </div>
-                `;
-            }).join('');
-
-            showScreen('resultsScreen');
-        }
-
-        function showPlayerResults() {
-            const checkResults = setInterval(() => {
-                const games = getGames();
-                const game = games[gameState.gameCode];
-                
-                if (!game) {
-                    clearInterval(checkResults);
-                    return;
-                }
-                
-                const allFinished = game.players.every(p => 
-                    p.answers.length >= gameState.questions.length
-                );
-                
-                if (allFinished) {
-                    clearInterval(checkResults);
-                    showResults();
-                }
-            }, 1000);
-        }
+        });
     </script>
 </body>
 </html>
