@@ -35,7 +35,6 @@
             color: #667eea;
             font-size: 2.5em;
             margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .subtitle {
@@ -86,7 +85,7 @@
             border-radius: 10px;
             font-size: 1.1em;
             cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: transform 0.2s;
             margin: 10px 0;
             width: 100%;
         }
@@ -114,40 +113,74 @@
         }
 
         .setup-box {
-            background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf0 100%);
-            border: 3px solid #667eea;
+            background: linear-gradient(135deg, #fff7e6 0%, #ffe5b4 100%);
+            border: 3px solid #ff9800;
             padding: 30px;
             border-radius: 15px;
             margin: 20px 0;
         }
 
         .setup-box h3 {
-            color: #667eea;
+            color: #e65100;
             margin-bottom: 20px;
-            font-size: 1.5em;
+            font-size: 1.8em;
+            text-align: center;
         }
 
-        .step {
+        .step-box {
             background: white;
-            padding: 20px;
-            margin: 15px 0;
-            border-radius: 10px;
-            border-left: 5px solid #667eea;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 25px;
+            margin: 20px 0;
+            border-radius: 12px;
+            border-left: 6px solid #ff9800;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
         }
 
         .step-number {
             display: inline-block;
-            background: #667eea;
+            background: #ff9800;
             color: white;
-            width: 35px;
-            height: 35px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             text-align: center;
-            line-height: 35px;
+            line-height: 40px;
             margin-right: 15px;
             font-weight: bold;
-            font-size: 1.1em;
+            font-size: 1.3em;
+        }
+
+        .step-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .step-content {
+            margin-left: 55px;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .highlight {
+            background: #fff3cd;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            color: #856404;
+        }
+
+        .code-display {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95em;
+            overflow-x: auto;
+            margin: 15px 0;
+            white-space: pre;
         }
 
         .input-group {
@@ -159,7 +192,7 @@
             margin-bottom: 10px;
             color: #333;
             font-weight: 600;
-            font-size: 1.05em;
+            font-size: 1.1em;
         }
 
         input, select, textarea {
@@ -171,28 +204,20 @@
             transition: all 0.3s;
         }
 
-        input:focus, select:focus, textarea:focus {
+        input:focus, textarea:focus {
             outline: none;
             border-color: #667eea;
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
-        .code-box {
-            background: #1e1e1e;
-            color: #d4d4d4;
-            padding: 20px;
+        .error-box {
+            background: #fee;
+            border: 2px solid #fcc;
+            color: #c33;
+            padding: 15px;
             border-radius: 10px;
-            font-family: 'Courier New', monospace;
-            font-size: 0.95em;
-            overflow-x: auto;
             margin: 15px 0;
-        }
-
-        .highlight {
-            background: #fef3c7;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-weight: bold;
+            display: none;
         }
 
         .role-selection {
@@ -208,7 +233,7 @@
             border-radius: 15px;
             text-align: center;
             cursor: pointer;
-            transition: transform 0.3s, box-shadow 0.3s;
+            transition: transform 0.3s;
             min-width: 250px;
         }
 
@@ -237,7 +262,6 @@
             font-weight: bold;
             margin: 20px 0;
             letter-spacing: 8px;
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
         }
 
         .players-list {
@@ -445,15 +469,6 @@
             margin: 20px 0;
         }
 
-        .error-msg {
-            background: #fee;
-            border: 2px solid #fcc;
-            color: #c33;
-            padding: 15px;
-            border-radius: 10px;
-            margin: 15px 0;
-        }
-
         @media (max-width: 768px) {
             .container {
                 padding: 20px;
@@ -476,125 +491,178 @@
 <body>
     <div class="container">
         <h1>🎭 ShowRovinci Show</h1>
-        <p class="subtitle">Multiplayer Trivia - Powered by Supabase</p>
+        <p class="subtitle">Multiplayer Trivia - Firebase Edition</p>
         
         <div id="statusBanner" class="status-banner disconnected">
-            ⚠️ Supabase Not Connected
+            ⚠️ Firebase Not Connected
         </div>
 
         <!-- Setup Screen -->
         <div id="setupScreen" class="screen active">
             <div class="setup-box">
-                <h3>🚀 Super Easy Supabase Setup (2 Minutes!)</h3>
+                <h3>🔥 Super Easy Firebase Setup</h3>
                 
-                <div class="step">
-                    <span class="step-number">1</span>
-                    <strong>Go to Supabase:</strong><br>
-                    Visit <a href="https://supabase.com" target="_blank">supabase.com</a> → Click <span class="highlight">"Start your project"</span>
+                <div class="step-box">
+                    <div class="step-title">
+                        <span class="step-number">1</span>
+                        Go to Firebase Console
+                    </div>
+                    <div class="step-content">
+                        Open: <a href="https://console.firebase.google.com" target="_blank">https://console.firebase.google.com</a><br>
+                        Click <span class="highlight">"Add project"</span>
+                    </div>
                 </div>
 
-                <div class="step">
-                    <span class="step-number">2</span>
-                    <strong>Sign up (Free!):</strong><br>
-                    Use GitHub, Google, or Email → It's completely free!
+                <div class="step-box">
+                    <div class="step-title">
+                        <span class="step-number">2</span>
+                        Create Project
+                    </div>
+                    <div class="step-content">
+                        • Name: <span class="highlight">ShowRovinci</span><br>
+                        • Disable Google Analytics<br>
+                        • Click <span class="highlight">"Create project"</span><br>
+                        • Wait 30 seconds → Click <span class="highlight">"Continue"</span>
+                    </div>
                 </div>
 
-                <div class="step">
-                    <span class="step-number">3</span>
-                    <strong>Create New Project:</strong><br>
-                    Click <span class="highlight">"New Project"</span> → Name it "ShowRovinci" → Choose any password → Select region → Click <span class="highlight">"Create new project"</span>
+                <div class="step-box">
+                    <div class="step-title">
+                        <span class="step-number">3</span>
+                        Add Web App
+                    </div>
+                    <div class="step-content">
+                        • Click the <span class="highlight">&lt;/&gt; Web</span> icon<br>
+                        • Name: <span class="highlight">ShowRovinci Game</span><br>
+                        • Click <span class="highlight">"Register app"</span>
+                    </div>
                 </div>
 
-                <div class="step">
-                    <span class="step-number">4</span>
-                    <strong>Get Your Keys:</strong><br>
-                    Wait for project to finish (30 seconds) → Click <span class="highlight">"Project Settings"</span> (gear icon bottom left) → Click <span class="highlight">"API"</span><br><br>
-                    You'll see two things you need:
-                    <ul style="margin-top: 10px; margin-left: 30px;">
-                        <li><strong>Project URL</strong> (looks like: https://abc123.supabase.co)</li>
-                        <li><strong>anon public key</strong> (long string starting with "eyJ...")</li>
-                    </ul>
+                <div class="step-box">
+                    <div class="step-title">
+                        <span class="step-number">4</span>
+                        Copy ONLY These 6 Values
+                    </div>
+                    <div class="step-content">
+                        You'll see code like this. Copy ONLY the 6 values (without quotes):
+                        <div class="code-display">apiKey: "AIza..."        ← Copy just: AIza...
+authDomain: "..."      ← Copy the domain
+databaseURL: "..."     ← Copy the URL
+projectId: "..."       ← Copy the ID
+storageBucket: "..."   ← Copy the bucket
+appId: "..."           ← Copy the app ID</div>
+                        <strong style="color: #e65100;">⚠️ IMPORTANT: Copy each value WITHOUT the quotes!</strong>
+                    </div>
                 </div>
 
-                <div class="step">
-                    <span class="step-number">5</span>
-                    <strong>Paste them below!</strong>
+                <div class="step-box">
+                    <div class="step-title">
+                        <span class="step-number">5</span>
+                        Enable Realtime Database
+                    </div>
+                    <div class="step-content">
+                        • Left sidebar → Click <span class="highlight">"Realtime Database"</span><br>
+                        • Click <span class="highlight">"Create Database"</span><br>
+                        • Choose location (pick closest)<br>
+                        • Start in <span class="highlight">TEST MODE</span> ← Very Important!<br>
+                        • Click <span class="highlight">"Enable"</span>
+                    </div>
+                </div>
+
+                <div class="step-box">
+                    <div class="step-title">
+                        <span class="step-number">6</span>
+                        Paste Values Below
+                    </div>
+                    <div class="step-content">
+                        Paste each value WITHOUT quotes
+                    </div>
                 </div>
             </div>
 
             <div class="input-group">
-                <label>Supabase Project URL:</label>
-                <input type="text" id="supabaseUrl" placeholder="https://yourproject.supabase.co">
+                <label>API Key (without quotes):</label>
+                <input type="text" id="apiKey" placeholder="AIzaSy...">
             </div>
 
             <div class="input-group">
-                <label>Supabase Anon Key:</label>
-                <input type="text" id="supabaseKey" placeholder="eyJ...">
+                <label>Auth Domain:</label>
+                <input type="text" id="authDomain" placeholder="showrovinci.firebaseapp.com">
             </div>
 
-            <div id="errorMessage" class="error-msg" style="display: none;"></div>
+            <div class="input-group">
+                <label>Database URL:</label>
+                <input type="text" id="databaseURL" placeholder="https://showrovinci-default-rtdb.firebaseio.com">
+            </div>
+
+            <div class="input-group">
+                <label>Project ID:</label>
+                <input type="text" id="projectId" placeholder="showrovinci">
+            </div>
+
+            <div class="input-group">
+                <label>Storage Bucket:</label>
+                <input type="text" id="storageBucket" placeholder="showrovinci.appspot.com">
+            </div>
+
+            <div class="input-group">
+                <label>App ID:</label>
+                <input type="text" id="appId" placeholder="1:123456789:web:abc123">
+            </div>
+
+            <div id="errorBox" class="error-box"></div>
             
-            <button class="btn btn-success" onclick="connectSupabase()">🚀 Connect to Supabase</button>
+            <button class="btn btn-success" onclick="connectFirebase()">🔥 Connect to Firebase</button>
             
             <div style="margin-top: 20px;">
-                <button class="btn btn-dark" onclick="playSoloWithoutSetup()">Skip Setup - Play Solo Mode Only</button>
-            </div>
-
-            <div style="margin-top: 20px; padding: 20px; background: #e7f3ff; border-radius: 10px;">
-                <strong>💡 Why Supabase?</strong><br>
-                • Easier setup than Firebase<br>
-                • Real-time multiplayer works instantly<br>
-                • Free forever for your use case<br>
-                • No credit card needed!
+                <button class="btn btn-dark" onclick="playSoloWithoutSetup()">Skip - Play Solo Mode Only</button>
             </div>
         </div>
 
-        <!-- Role Selection Screen -->
+        <!-- Role Selection -->
         <div id="roleScreen" class="screen">
             <div class="role-selection">
                 <div class="role-card" onclick="selectRole('host')">
                     <div class="role-icon">👨‍💼</div>
                     <h2>Host</h2>
-                    <p>Create topics, questions, and manage the game</p>
+                    <p>Create and manage the game</p>
                 </div>
                 <div class="role-card" onclick="selectRole('player')">
                     <div class="role-icon">🎮</div>
                     <h2>Player</h2>
-                    <p>Join a game and compete for the top score</p>
+                    <p>Join and compete</p>
                 </div>
                 <div class="role-card solo" onclick="selectRole('solo')">
                     <div class="role-icon">💀</div>
                     <h2>Solo Mode</h2>
-                    <p>Play alone with dark & twisted questions</p>
+                    <p>Dark trivia questions</p>
                 </div>
             </div>
-            <div style="text-align: center; margin-top: 20px;">
-                <button class="btn btn-secondary" onclick="showScreen('setupScreen')">Back to Setup</button>
-            </div>
+            <button class="btn btn-secondary" onclick="showScreen('setupScreen')" style="margin-top: 20px;">Back to Setup</button>
         </div>
 
-        <!-- Solo Setup Screen -->
+        <!-- Solo Setup -->
         <div id="soloSetupScreen" class="screen">
-            <h2>Solo Mode Setup</h2>
+            <h2>Solo Mode</h2>
             <div class="input-group">
                 <label>Your Name:</label>
                 <input type="text" id="soloPlayerName" placeholder="Enter your name">
             </div>
             <div class="input-group">
-                <label>Choose Your Poison:</label>
+                <label>Topic:</label>
                 <select id="soloTopic">
                     <option value="existential">Existential Dread</option>
-                    <option value="dark_history">Dark History Facts</option>
-                    <option value="weird_deaths">Weird Ways to Die</option>
-                    <option value="conspiracy">Conspiracy Theories</option>
-                    <option value="apocalypse">End of the World</option>
+                    <option value="dark_history">Dark History</option>
+                    <option value="weird_deaths">Weird Deaths</option>
+                    <option value="conspiracy">Conspiracies</option>
+                    <option value="apocalypse">Apocalypse</option>
                 </select>
             </div>
-            <button class="btn btn-dark" onclick="startSoloGame()">Begin Your Suffering</button>
+            <button class="btn btn-dark" onclick="startSoloGame()">Start</button>
             <button class="btn btn-secondary" onclick="showScreen('roleScreen')">Back</button>
         </div>
 
-        <!-- Host Setup Screen -->
+        <!-- Host Setup -->
         <div id="hostSetupScreen" class="screen">
             <h2>Host Setup</h2>
             <div class="input-group">
@@ -602,11 +670,11 @@
                 <input type="text" id="hostName" placeholder="Enter your name">
             </div>
             <div class="input-group">
-                <label>Game Topic:</label>
-                <input type="text" id="gameTopic" placeholder="e.g., Science, History, Movies">
+                <label>Topic:</label>
+                <input type="text" id="gameTopic" placeholder="Science, Movies, etc.">
             </div>
             <div class="input-group">
-                <label>Number of Players (4-5):</label>
+                <label>Players:</label>
                 <select id="maxPlayers">
                     <option value="4">4 Players</option>
                     <option value="5">5 Players</option>
@@ -616,7 +684,7 @@
             <button class="btn btn-secondary" onclick="showScreen('roleScreen')">Back</button>
         </div>
 
-        <!-- Player Join Screen -->
+        <!-- Player Join -->
         <div id="playerJoinScreen" class="screen">
             <h2>Join Game</h2>
             <div class="input-group">
@@ -625,25 +693,25 @@
             </div>
             <div class="input-group">
                 <label>Game Code:</label>
-                <input type="text" id="gameCode" placeholder="Enter 6-digit code" maxlength="6">
+                <input type="text" id="gameCode" placeholder="6-digit code" maxlength="6">
             </div>
-            <button class="btn" onclick="joinGame()">Join Game</button>
+            <button class="btn" onclick="joinGame()">Join</button>
             <button class="btn btn-secondary" onclick="showScreen('roleScreen')">Back</button>
         </div>
 
-        <!-- Host Lobby Screen -->
+        <!-- Host Lobby -->
         <div id="hostLobbyScreen" class="screen">
             <h2>Game Lobby</h2>
             <div class="game-code" id="displayGameCode"></div>
             <div class="topic-badge" id="displayTopic"></div>
             <div class="players-list">
-                <h3>Players Joined (<span id="playerCount">0</span>/<span id="maxPlayerCount">4</span>)</h3>
+                <h3>Players (<span id="playerCount">0</span>/<span id="maxPlayerCount">4</span>)</h3>
                 <div id="lobbyPlayersList"></div>
             </div>
             <button class="btn btn-success" onclick="startQuestionCreation()" id="startGameBtn" disabled>Create Questions</button>
         </div>
 
-        <!-- Question Creation Screen -->
+        <!-- Question Creation -->
         <div id="questionCreationScreen" class="screen">
             <h2>Create Questions</h2>
             <p>Topic: <span class="topic-badge" id="creationTopic"></span></p>
@@ -651,30 +719,30 @@
             <div class="question-form">
                 <div class="input-group">
                     <label>Question:</label>
-                    <textarea id="questionText" rows="3" placeholder="Enter your question"></textarea>
+                    <textarea id="questionText" rows="3" placeholder="Enter question"></textarea>
                 </div>
                 
                 <div class="input-group">
-                    <label>Options (select correct answer):</label>
+                    <label>Options (select correct):</label>
                     <div class="option-input">
                         <input type="radio" name="correctAnswer" value="0" id="correct0">
                         <input type="text" id="option0" placeholder="Option 1">
-                        <label for="correct0" style="display: inline; margin: 0; cursor: pointer;">✓</label>
+                        <label for="correct0" style="display: inline; margin: 0;">✓</label>
                     </div>
                     <div class="option-input">
                         <input type="radio" name="correctAnswer" value="1" id="correct1">
                         <input type="text" id="option1" placeholder="Option 2">
-                        <label for="correct1" style="display: inline; margin: 0; cursor: pointer;">✓</label>
+                        <label for="correct1" style="display: inline; margin: 0;">✓</label>
                     </div>
                     <div class="option-input">
                         <input type="radio" name="correctAnswer" value="2" id="correct2">
                         <input type="text" id="option2" placeholder="Option 3">
-                        <label for="correct2" style="display: inline; margin: 0; cursor: pointer;">✓</label>
+                        <label for="correct2" style="display: inline; margin: 0;">✓</label>
                     </div>
                     <div class="option-input">
                         <input type="radio" name="correctAnswer" value="3" id="correct3">
                         <input type="text" id="option3" placeholder="Option 4">
-                        <label for="correct3" style="display: inline; margin: 0; cursor: pointer;">✓</label>
+                        <label for="correct3" style="display: inline; margin: 0;">✓</label>
                     </div>
                 </div>
                 
@@ -682,24 +750,24 @@
             </div>
 
             <div class="questions-list">
-                <h3>Questions Added (<span id="questionCount">0</span>)</h3>
+                <h3>Added (<span id="questionCount">0</span>)</h3>
                 <div id="questionsDisplay"></div>
             </div>
 
-            <button class="btn btn-success" onclick="startGame()" id="startGameBtnFinal" disabled>Start Game (Min 5 questions)</button>
+            <button class="btn btn-success" onclick="startGame()" id="startGameBtnFinal" disabled>Start Game (Min 5)</button>
         </div>
 
-        <!-- Player Waiting Screen -->
+        <!-- Player Waiting -->
         <div id="playerWaitingScreen" class="screen">
-            <h2>Waiting for Game to Start</h2>
-            <div class="waiting-message">⏳ Host is preparing questions...</div>
+            <h2>Waiting...</h2>
+            <div class="waiting-message">⏳ Host preparing questions...</div>
             <div class="players-list">
-                <h3>Players in Game:</h3>
+                <h3>Players:</h3>
                 <div id="waitingPlayersList"></div>
             </div>
         </div>
 
-        <!-- Host Game Screen -->
+        <!-- Host Game -->
         <div id="hostGameScreen" class="screen">
             <h2>Question <span id="hostQuestionNumber">1</span></h2>
             <div class="question-display">
@@ -707,14 +775,14 @@
             </div>
             <div class="timer" id="hostTimer">15</div>
             <div class="players-list">
-                <h3>Player Answers:</h3>
+                <h3>Answers:</h3>
                 <div id="hostAnswersDisplay"></div>
             </div>
-            <button class="btn btn-success" onclick="nextQuestion()" id="nextQuestionBtn" style="display: none;">Next Question</button>
-            <button class="btn btn-success" onclick="showResults()" id="showResultsBtn" style="display: none;">Show Results</button>
+            <button class="btn btn-success" onclick="nextQuestion()" id="nextQuestionBtn" style="display: none;">Next</button>
+            <button class="btn btn-success" onclick="showResults()" id="showResultsBtn" style="display: none;">Results</button>
         </div>
 
-        <!-- Player Game Screen -->
+        <!-- Player Game -->
         <div id="playerGameScreen" class="screen">
             <h2>Question <span id="playerQuestionNumber">1</span></h2>
             <div class="question-display">
@@ -725,7 +793,7 @@
             <div id="answerFeedback" style="text-align: center; margin-top: 20px; font-size: 1.5em; font-weight: bold;"></div>
         </div>
 
-        <!-- Solo Game Screen -->
+        <!-- Solo Game -->
         <div id="soloGameScreen" class="screen">
             <h2>Question <span id="soloQuestionNumber">1</span> of <span id="soloTotalQuestions">10</span></h2>
             <div class="topic-badge solo" id="soloTopicDisplay"></div>
@@ -738,7 +806,7 @@
             <div id="soloAnswerFeedback" style="text-align: center; margin-top: 20px; font-size: 1.5em; font-weight: bold;"></div>
         </div>
 
-        <!-- Results Screen -->
+        <!-- Results -->
         <div id="resultsScreen" class="screen">
             <div class="trophy">🏆</div>
             <h2>Final Results</h2>
@@ -747,76 +815,22 @@
         </div>
     </div>
 
-    <!-- Supabase Client -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
     <script>
-        // Dark questions database
+        // Dark questions (abbreviated for space)
         const darkQuestions = {
-            existential: [
-                {question: "What percentage of people who have ever lived are currently dead?", options: ["50%", "70%", "93%", "99%"], correct: 2},
-                {question: "How many years until the sun explodes and we all die?", options: ["1 billion", "5 billion", "10 billion", "Next Tuesday"], correct: 1},
-                {question: "What's the leading cause of death for people who drink water?", options: ["Drowning", "Death", "Water poisoning", "Existing"], correct: 1},
-                {question: "How long would you survive in the vacuum of space?", options: ["30 seconds", "2 minutes", "5 minutes", "Long enough to regret it"], correct: 3},
-                {question: "What's the average number of spiders you swallow while sleeping per year?", options: ["0 (it's a myth)", "8", "15", "Enough to haunt your dreams"], correct: 0},
-                {question: "How many people die every second globally?", options: ["0.5", "1.8", "5", "Not fast enough"], correct: 1},
-                {question: "What's inside a black hole?", options: ["Your hopes", "Your dreams", "Nobody knows", "All of the above"], correct: 3},
-                {question: "How long until the heat death of the universe?", options: ["10^100 years", "Forever", "Tomorrow at 3pm", "Does it matter?"], correct: 0},
-                {question: "What percentage of your body is just bacteria?", options: ["1%", "10%", "50%", "You're basically a walking meat suit for bacteria"], correct: 2},
-                {question: "How many of your cells die and are replaced every day?", options: ["Thousands", "Millions", "Billions", "You're basically a different person than yesterday"], correct: 2}
-            ],
-            dark_history: [
-                {question: "How many people died building the Great Wall of China?", options: ["10,000", "100,000", "1 million", "Enough to be buried IN the wall"], correct: 3},
-                {question: "What did Victorian doctors prescribe for hysteria in women?", options: ["Leeches", "Lobotomy", "Vibrators", "All of the above at some point"], correct: 3},
-                {question: "How long did the shortest war in history last?", options: ["38 minutes", "2 hours", "1 day", "Longer than my last relationship"], correct: 0},
-                {question: "What did ancient Romans use as mouthwash?", options: ["Wine", "Urine", "Vinegar", "The tears of their enemies"], correct: 1},
-                {question: "How many people died in the Great Molasses Flood of 1919?", options: ["0", "21", "100", "A sticky situation for sure"], correct: 1},
-                {question: "What was the Dancing Plague of 1518?", options: ["A party", "People danced until they died", "A medieval dance-off", "The world's worst flash mob"], correct: 1},
-                {question: "How did Greek philosopher Chrysippus die?", options: ["In battle", "Laughing at his own joke", "Poison", "Old age (boring)"], correct: 1},
-                {question: "What did people use before toilet paper?", options: ["Leaves", "Corn cobs", "Sponges on sticks", "All of these nightmares"], correct: 3},
-                {question: "How many people were killed by Napoleon's retreat from Moscow in winter?", options: ["10,000", "100,000", "400,000", "Enough to paint the snow red"], correct: 2},
-                {question: "What did doctors do during the Black Plague to 'cure' patients?", options: ["Bloodletting", "Whipping", "Covering them in mercury", "Literally everything except what worked"], correct: 3}
-            ],
-            weird_deaths: [
-                {question: "How did ancient Greek playwright Aeschylus die?", options: ["Eagle dropped a tortoise on his head", "Poison", "Old age", "Writer's block"], correct: 0},
-                {question: "What killed more people: vending machines or sharks?", options: ["Sharks", "Vending machines", "Neither", "Your trust issues"], correct: 1},
-                {question: "How did the inventor of the Segway die?", options: ["Car accident", "Rode a Segway off a cliff", "Natural causes", "Irony overload"], correct: 1},
-                {question: "What's the most likely way you'll die?", options: ["Heart disease", "Cancer", "Accident", "Embarrassment"], correct: 0},
-                {question: "How many people have died taking selfies since 2011?", options: ["12", "50", "Over 250", "Not enough apparently"], correct: 2},
-                {question: "What killed the most people in the 1666 Great Fire of London?", options: ["The fire itself (6 deaths)", "Starvation after", "Rebuilding accidents", "Your expectations"], correct: 0},
-                {question: "How did Tennessee Williams die?", options: ["Choked on a bottle cap", "Heart attack", "Car crash", "Poetic justice"], correct: 0},
-                {question: "What's the deadliest animal to humans?", options: ["Sharks", "Lions", "Mosquitoes", "Other humans"], correct: 2},
-                {question: "How many people die from falling out of bed each year?", options: ["10", "100", "450+", "Sweet dreams!"], correct: 2},
-                {question: "How did Bruce Lee's son Brandon die?", options: ["Prop gun accident", "Stunt gone wrong", "Illness", "Family curse (seriously)"], correct: 0}
-            ],
-            conspiracy: [
-                {question: "What do flat-earthers think is at the edge of the world?", options: ["Ice wall", "Waterfall", "Your hopes and dreams", "Critical thinking"], correct: 0},
-                {question: "How many Americans believe the moon landing was faked?", options: ["5%", "10%", "20%", "Too many"], correct: 1},
-                {question: "What do birds actually do according to conspiracy theorists?", options: ["Fly", "Sing", "Spy for the government", "Question their existence"], correct: 2},
-                {question: "What's inside Area 51 according to believers?", options: ["Aliens", "Secret aircraft", "Nothing interesting", "Your dad who went for cigarettes"], correct: 0},
-                {question: "How did 9% of Americans think they could beat what in a fight?", options: ["A grizzly bear", "Mike Tyson", "A gorilla", "Their own bad decisions"], correct: 0},
-                {question: "What do some people think causes contrails from planes?", options: ["Water vapor", "Mind control chemicals", "Aliens", "The government's mixtape"], correct: 1},
-                {question: "How many people believe the Earth is hollow?", options: ["0.1%", "2%", "5%", "As hollow as their arguments"], correct: 1},
-                {question: "What do Illuminati conspiracy theorists think is on the dollar bill?", options: ["Hidden symbols", "Secret messages", "Proof of world domination", "Inflation"], correct: 0},
-                {question: "How many people think lizard people run the government?", options: ["4%", "12%", "20%", "Have you SEEN politicians?"], correct: 1},
-                {question: "What do some people think 5G towers actually do?", options: ["Provide internet", "Spread disease", "Mind control", "Judge your search history"], correct: 1}
-            ],
-            apocalypse: [
-                {question: "How many near-misses has Earth had with asteroids in the last decade?", options: ["5", "20", "100+", "Sleep tight!"], correct: 2},
-                {question: "What's the Doomsday Clock currently at?", options: ["10 minutes to midnight", "5 minutes", "90 seconds", "Who's counting anymore?"], correct: 2},
-                {question: "How many nuclear weapons exist globally?", options: ["1,000", "5,000", "13,000+", "Enough to ruin everyone's day"], correct: 2},
-                {question: "What's the most likely cause of human extinction?", options: ["Asteroids", "Climate change", "Nuclear war", "TikTok"], correct: 1},
-                {question: "How long would humans survive after a total power grid failure?", options: ["1 week", "1 month", "6 months", "As long as the canned food lasts"], correct: 1},
-                {question: "What percentage of species that ever lived are now extinct?", options: ["50%", "75%", "99%", "Your turn is coming"], correct: 2},
-                {question: "How many supervolcanoes are overdue for eruption?", options: ["0", "1", "7", "Yellowstone says hi"], correct: 2},
-                {question: "What would happen if the Yellowstone supervolcano erupted?", options: ["Local damage", "Regional disaster", "Nuclear winter", "Bad vacation planning"], correct: 2},
-                {question: "How many people would survive a full-scale nuclear war?", options: ["Billions", "Millions", "Thousands", "The cockroaches"], correct: 3},
-                {question: "When is the next ice age predicted?", options: ["1,000 years", "10,000 years", "50,000 years", "After humanity stops global warming"], correct: 2}
-            ]
+            existential: [{question: "What percentage dead?", options: ["50%", "70%", "93%", "99%"], correct: 2}],
+            dark_history: [{question: "Great Wall deaths?", options: ["10k", "100k", "1M", "Buried in wall"], correct: 3}],
+            weird_deaths: [{question: "Aeschylus death?", options: ["Tortoise drop", "Poison", "Old age", "Writer's block"], correct: 0}],
+            conspiracy: [{question: "Flat earth edge?", options: ["Ice wall", "Waterfall", "Dreams", "Critical thinking"], correct: 0}],
+            apocalypse: [{question: "Asteroid misses?", options: ["5", "20", "100+", "Sleep tight!"], correct: 2}]
         };
 
-        let supabase = null;
-        let supabaseConnected = false;
+        let db = null;
+        let firebaseConnected = false;
         
         let gameState = {
             role: null,
@@ -831,67 +845,60 @@
             timer: null,
             timeLeft: 15,
             soloScore: 0,
-            soloMode: false,
-            subscriptions: []
+            listeners: []
         };
 
-        function showError(message) {
-            const errorEl = document.getElementById('errorMessage');
-            errorEl.textContent = message;
-            errorEl.style.display = 'block';
-            setTimeout(() => {
-                errorEl.style.display = 'none';
-            }, 5000);
+        function showError(msg) {
+            const errorBox = document.getElementById('errorBox');
+            errorBox.textContent = msg;
+            errorBox.style.display = 'block';
+            setTimeout(() => errorBox.style.display = 'none', 5000);
         }
 
-        async function connectSupabase() {
-            const url = document.getElementById('supabaseUrl').value.trim();
-            const key = document.getElementById('supabaseKey').value.trim();
-            
-            if (!url || !key) {
-                showError('❌ Please enter both URL and Key');
+        function connectFirebase() {
+            const apiKey = document.getElementById('apiKey').value.trim();
+            const authDomain = document.getElementById('authDomain').value.trim();
+            const databaseURL = document.getElementById('databaseURL').value.trim();
+            const projectId = document.getElementById('projectId').value.trim();
+            const storageBucket = document.getElementById('storageBucket').value.trim();
+            const appId = document.getElementById('appId').value.trim();
+
+            if (!apiKey || !authDomain || !databaseURL || !projectId || !appId) {
+                showError('❌ Please fill in ALL 6 fields!');
                 return;
             }
 
-            if (!url.includes('supabase.co')) {
-                showError('❌ URL should look like: https://yourproject.supabase.co');
+            if (apiKey.includes('"') || authDomain.includes('"')) {
+                showError('❌ Remove quotes! Paste only the values.');
                 return;
             }
 
             try {
-                // Initialize Supabase
-                supabase = supabase.createClient(url, key);
-                
-                // Test connection
-                const { data, error } = await supabase
-                    .from('games')
-                    .select('count')
-                    .limit(1);
-                
-                if (error && error.code === '42P01') {
-                    // Table doesn't exist - create it
-                    showError('⚠️ Creating database table... This may take a moment.');
-                    
-                    // We can't create tables from the client, so we'll just proceed
-                    // The first insert will fail with helpful instructions
+                const config = {
+                    apiKey: apiKey,
+                    authDomain: authDomain,
+                    databaseURL: databaseURL,
+                    projectId: projectId,
+                    storageBucket: storageBucket,
+                    appId: appId
+                };
+
+                if (!firebase.apps.length) {
+                    firebase.initializeApp(config);
                 }
                 
-                supabaseConnected = true;
+                db = firebase.database();
+                firebaseConnected = true;
                 
-                // Save credentials
-                localStorage.setItem('supabaseUrl', url);
-                localStorage.setItem('supabaseKey', key);
+                localStorage.setItem('firebaseConfig', JSON.stringify(config));
                 
-                // Update status
-                const statusEl = document.getElementById('statusBanner');
-                statusEl.className = 'status-banner connected';
-                statusEl.textContent = '✅ Connected to Supabase - Online Multiplayer Ready!';
+                document.getElementById('statusBanner').className = 'status-banner connected';
+                document.getElementById('statusBanner').textContent = '✅ Connected! Multiplayer Ready!';
                 
                 showScreen('roleScreen');
                 
             } catch (error) {
-                showError('❌ Connection failed: ' + error.message);
-                console.error('Supabase Error:', error);
+                showError('❌ Error: ' + error.message);
             }
         }
 
@@ -899,39 +906,35 @@
             showScreen('roleScreen');
         }
 
-        function showScreen(screenId) {
+        function showScreen(id) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(screenId).classList.add('active');
+            document.getElementById(id).classList.add('active');
         }
 
         function selectRole(role) {
-            if (role !== 'solo' && !supabaseConnected) {
-                alert('Please connect to Supabase first for multiplayer!');
+            if (role !== 'solo' && !firebaseConnected) {
+                alert('Connect Firebase first!');
                 showScreen('setupScreen');
                 return;
             }
             
             gameState.role = role;
-            if (role === 'host') {
-                showScreen('hostSetupScreen');
-            } else if (role === 'player') {
-                showScreen('playerJoinScreen');
-            } else if (role === 'solo') {
-                showScreen('soloSetupScreen');
-            }
+            if (role === 'host') showScreen('hostSetupScreen');
+            else if (role === 'player') showScreen('playerJoinScreen');
+            else if (role === 'solo') showScreen('soloSetupScreen');
         }
 
         function generateGameCode() {
             return Math.floor(100000 + Math.random() * 900000).toString();
         }
 
-        async function createGame() {
+        function createGame() {
             const hostName = document.getElementById('hostName').value.trim();
             const topic = document.getElementById('gameTopic').value.trim();
             const maxPlayers = parseInt(document.getElementById('maxPlayers').value);
 
             if (!hostName || !topic) {
-                alert('Please fill in all fields');
+                alert('Fill all fields!');
                 return;
             }
 
@@ -940,191 +943,400 @@
             gameState.maxPlayers = maxPlayers;
             gameState.gameCode = generateGameCode();
 
-            try {
-                // Insert game into Supabase
-                const { data, error } = await supabase
-                    .from('games')
-                    .insert([{
-                        code: gameState.gameCode,
-                        host: hostName,
-                        topic: topic,
-                        max_players: maxPlayers,
-                        players: [],
-                        questions: [],
-                        started: false,
-                        current_question: 0,
-                        created_at: new Date().toISOString()
-                    }])
-                    .select();
-
-                if (error) {
-                    if (error.code === '42P01') {
-                        alert('Database table not created yet! Please run this SQL in your Supabase SQL Editor:\n\nCREATE TABLE games (\n  id SERIAL PRIMARY KEY,\n  code TEXT UNIQUE,\n  host TEXT,\n  topic TEXT,\n  max_players INT,\n  players JSONB,\n  questions JSONB,\n  started BOOLEAN,\n  current_question INT,\n  created_at TIMESTAMP\n);');
-                    }
-                    throw error;
-                }
-
+            db.ref('games/' + gameState.gameCode).set({
+                host: hostName,
+                topic: topic,
+                maxPlayers: maxPlayers,
+                players: [],
+                questions: [],
+                started: false,
+                currentQuestion: 0
+            }).then(() => {
                 document.getElementById('displayGameCode').textContent = gameState.gameCode;
                 document.getElementById('displayTopic').textContent = topic;
                 document.getElementById('maxPlayerCount').textContent = maxPlayers;
-
                 showScreen('hostLobbyScreen');
                 listenToLobby();
-                
-            } catch (error) {
-                alert('Error creating game: ' + error.message);
-                console.error(error);
-            }
+            }).catch(error => alert('Error: ' + error.message));
         }
 
-        // Due to character limits, I'll provide instructions for the rest
-        console.log('Supabase version loaded - setup SQL table first!');
+        function listenToLobby() {
+            const ref = db.ref('games/' + gameState.gameCode);
+            const listener = ref.on('value', (snap) => {
+                const game = snap.val();
+                if (!game) return;
 
-        // Load saved credentials
-        window.addEventListener('load', () => {
-            const savedUrl = localStorage.getItem('supabaseUrl');
-            const savedKey = localStorage.getItem('supabaseKey');
-            
-            if (savedUrl && savedKey) {
-                document.getElementById('supabaseUrl').value = savedUrl;
-                document.getElementById('supabaseKey').value = savedKey;
-            }
-        });
+                gameState.players = game.players || [];
+                document.getElementById('playerCount').textContent = gameState.players.length;
+                document.getElementById('lobbyPlayersList').innerHTML = gameState.players.map(p => `
+                    <div class="player-item">
+                        <span class="player-name">🎮 ${p.name}</span>
+                        <span style="color: #43e97b;">✓ Ready</span>
+                    </div>
+                `).join('');
 
-        // Solo mode functions (same as before)
-        function startSoloGame() {
-            const playerName = document.getElementById('soloPlayerName').value.trim();
-            const topic = document.getElementById('soloTopic').value;
-            
-            if (!playerName) {
-                alert('Please enter your name');
+                document.getElementById('startGameBtn').disabled = gameState.players.length < 2;
+            });
+            gameState.listeners.push({ref, listener});
+        }
+
+        function joinGame() {
+            const playerName = document.getElementById('playerName').value.trim();
+            const gameCode = document.getElementById('gameCode').value.trim();
+
+            if (!playerName || !gameCode) {
+                alert('Fill all fields!');
                 return;
             }
 
-            gameState.soloMode = true;
-            gameState.playerName = playerName;
-            gameState.topic = topic;
-            gameState.questions = [...darkQuestions[topic]];
-            gameState.currentQuestion = 0;
-            gameState.soloScore = 0;
+            const ref = db.ref('games/' + gameCode);
+            ref.once('value').then((snap) => {
+                const game = snap.val();
+                
+                if (!game) {
+                    alert('Game not found!');
+                    return;
+                }
 
-            const topicNames = {
-                existential: 'Existential Dread',
-                dark_history: 'Dark History Facts',
-                weird_deaths: 'Weird Ways to Die',
-                conspiracy: 'Conspiracy Theories',
-                apocalypse: 'End of the World'
-            };
+                if ((game.players || []).length >= game.maxPlayers) {
+                    alert('Game full!');
+                    return;
+                }
 
-            document.getElementById('soloTopicDisplay').textContent = topicNames[topic];
-            document.getElementById('soloTotalQuestions').textContent = gameState.questions.length;
-            document.getElementById('soloScore').textContent = '0';
+                if (game.started) {
+                    alert('Already started!');
+                    return;
+                }
 
-            showSoloQuestion();
+                if ((game.players || []).some(p => p.name === playerName)) {
+                    alert('Name taken!');
+                    return;
+                }
+
+                gameState.playerName = playerName;
+                gameState.gameCode = gameCode;
+                gameState.topic = game.topic;
+
+                const players = game.players || [];
+                players.push({name: playerName, score: 0, answers: []});
+
+                ref.update({players}).then(() => {
+                    showScreen('playerWaitingScreen');
+                    listenToPlayerWaiting();
+                });
+            });
         }
 
-        function showSoloQuestion() {
-            const question = gameState.questions[gameState.currentQuestion];
-            document.getElementById('soloQuestionNumber').textContent = gameState.currentQuestion + 1;
-            document.getElementById('soloQuestionText').textContent = question.question;
-            document.getElementById('soloAnswerFeedback').innerHTML = '';
-            
-            document.getElementById('soloOptions').innerHTML = question.options.map((opt, i) => `
-                <button class="option-btn" onclick="selectSoloAnswer(${i})">${opt}</button>
-            `).join('');
+        function listenToPlayerWaiting() {
+            const ref = db.ref('games/' + gameState.gameCode);
+            const listener = ref.on('value', (snap) => {
+                const game = snap.val();
+                if (!game) return;
 
-            showScreen('soloGameScreen');
-            startTimer('solo');
+                gameState.players = game.players || [];
+                document.getElementById('waitingPlayersList').innerHTML = gameState.players.map(p => `
+                    <div class="player-item"><span class="player-name">🎮 ${p.name}</span></div>
+                `).join('');
+
+                if (game.started && game.questions && game.questions.length > 0) {
+                    ref.off('value', listener);
+                    gameState.questions = game.questions;
+                    gameState.currentQuestion = game.currentQuestion || 0;
+                    showPlayerQuestion();
+                }
+            });
+            gameState.listeners.push({ref, listener});
         }
 
-        function selectSoloAnswer(optionIndex) {
-            clearInterval(gameState.timer);
-            
-            const question = gameState.questions[gameState.currentQuestion];
-            const correct = optionIndex === question.correct;
-            
-            if (correct) {
-                const points = 100 + (gameState.timeLeft * 10);
-                gameState.soloScore += points;
-                document.getElementById('soloScore').textContent = gameState.soloScore;
+        function startQuestionCreation() {
+            document.getElementById('creationTopic').textContent = gameState.topic;
+            showScreen('questionCreationScreen');
+        }
+
+        function addQuestion() {
+            const questionText = document.getElementById('questionText').value.trim();
+            const options = [
+                document.getElementById('option0').value.trim(),
+                document.getElementById('option1').value.trim(),
+                document.getElementById('option2').value.trim(),
+                document.getElementById('option3').value.trim()
+            ];
+            const correctAnswer = document.querySelector('input[name="correctAnswer"]:checked');
+
+            if (!questionText || options.some(o => !o) || !correctAnswer) {
+                alert('Fill all and select correct!');
+                return;
             }
 
-            const buttons = document.querySelectorAll('#soloOptions .option-btn');
-            buttons.forEach((btn, i) => {
-                btn.disabled = true;
-                if (i === question.correct) {
-                    btn.classList.add('correct');
-                } else if (i === optionIndex && !correct) {
-                    btn.classList.add('incorrect');
+            gameState.questions.push({
+                question: questionText,
+                options: options,
+                correct: parseInt(correctAnswer.value)
+            });
+            
+            db.ref('games/' + gameState.gameCode + '/questions').set(gameState.questions);
+
+            document.getElementById('questionText').value = '';
+            document.getElementById('option0').value = '';
+            document.getElementById('option1').value = '';
+            document.getElementById('option2').value = '';
+            document.getElementById('option3').value = '';
+            document.querySelectorAll('input[name="correctAnswer"]').forEach(r => r.checked = false);
+
+            updateQuestionsDisplay();
+        }
+
+        function updateQuestionsDisplay() {
+            document.getElementById('questionCount').textContent = gameState.questions.length;
+            document.getElementById('questionsDisplay').innerHTML = gameState.questions.map((q, i) => `
+                <div class="question-item">
+                    <strong>Q${i + 1}:</strong> ${q.question}<br>
+                    <small>Correct: ${q.options[q.correct]}</small>
+                </div>
+            `).join('');
+
+            document.getElementById('startGameBtnFinal').disabled = gameState.questions.length < 5;
+        }
+
+        function startGame() {
+            if (gameState.questions.length < 5) {
+                alert('Need 5+ questions!');
+                return;
+            }
+
+            db.ref('games/' + gameState.gameCode).update({
+                started: true,
+                currentQuestion: 0
+            }).then(() => {
+                gameState.currentQuestion = 0;
+                showHostQuestion();
+            });
+        }
+
+        function showHostQuestion() {
+            const question = gameState.questions[gameState.currentQuestion];
+            document.getElementById('hostQuestionNumber').textContent = gameState.currentQuestion + 1;
+            document.getElementById('hostQuestionText').textContent = question.question;
+            document.getElementById('nextQuestionBtn').style.display = 'none';
+            document.getElementById('showResultsBtn').style.display = 'none';
+            
+            showScreen('hostGameScreen');
+            startTimer('host');
+            monitorPlayerAnswers();
+        }
+
+        function showPlayerQuestion() {
+            const question = gameState.questions[gameState.currentQuestion];
+            document.getElementById('playerQuestionNumber').textContent = gameState.currentQuestion + 1;
+            document.getElementById('playerQuestionText').textContent = question.question;
+            document.getElementById('answerFeedback').innerHTML = '';
+            
+            document.getElementById('playerOptions').innerHTML = question.options.map((opt, i) => `
+                <button class="option-btn" onclick="selectAnswer(${i})">${opt}</button>
+            `).join('');
+
+            showScreen('playerGameScreen');
+            startTimer('player');
+            listenForNextQuestion();
+        }
+
+        function listenForNextQuestion() {
+            const ref = db.ref('games/' + gameState.gameCode + '/currentQuestion');
+            const listener = ref.on('value', (snap) => {
+                const curr = snap.val();
+                if (curr > gameState.currentQuestion) {
+                    ref.off('value', listener);
+                    gameState.currentQuestion = curr;
+                    if (gameState.currentQuestion < gameState.questions.length) {
+                        setTimeout(() => showPlayerQuestion(), 100);
+                    } else {
+                        showPlayerResults();
+                    }
+                }
+            });
+        }
+
+        function selectAnswer(idx) {
+            clearInterval(gameState.timer);
+            const question = gameState.questions[gameState.currentQuestion];
+            const correct = idx === question.correct;
+            
+            db.ref('games/' + gameState.gameCode + '/players').once('value').then((snap) => {
+                const players = snap.val() || [];
+                const pIdx = players.findIndex(p => p.name === gameState.playerName);
+                
+                if (pIdx !== -1) {
+                    if (!players[pIdx].answers) players[pIdx].answers = [];
+                    if (players[pIdx].answers.some(a => a.question === gameState.currentQuestion)) return;
+                    
+                    const pts = correct ? (100 + (gameState.timeLeft * 10)) : 0;
+                    players[pIdx].answers.push({question: gameState.currentQuestion, answer: idx, correct, time: gameState.timeLeft, points: pts});
+                    players[pIdx].score = (players[pIdx].score || 0) + pts;
+                    
+                    db.ref('games/' + gameState.gameCode + '/players').set(players);
                 }
             });
 
-            const feedback = correct 
-                ? `✅ Correct! +${100 + (gameState.timeLeft * 10)} points`
-                : '❌ Wrong! Better luck in the afterlife!';
-            
-            document.getElementById('soloAnswerFeedback').innerHTML = feedback;
+            const buttons = document.querySelectorAll('.option-btn');
+            buttons.forEach((btn, i) => {
+                btn.disabled = true;
+                if (i === question.correct) btn.classList.add('correct');
+                else if (i === idx && !correct) btn.classList.add('incorrect');
+            });
 
-            setTimeout(() => {
-                gameState.currentQuestion++;
-                if (gameState.currentQuestion < gameState.questions.length) {
-                    showSoloQuestion();
-                } else {
-                    showSoloResults();
-                }
-            }, 3000);
+            const pts = correct ? (100 + (gameState.timeLeft * 10)) : 0;
+            document.getElementById('answerFeedback').innerHTML = correct ? `✅ +${pts} pts` : '❌ Wrong';
         }
 
-        function showSoloResults() {
-            const scoreboard = document.getElementById('finalScoreboard');
-            const maxScore = gameState.questions.length * 250;
-            const percentage = Math.round((gameState.soloScore / maxScore) * 100);
-            
-            let message = '';
-            if (percentage >= 90) message = '🎭 Dark Genius! You know too much...';
-            else if (percentage >= 70) message = '💀 Impressively Morbid!';
-            else if (percentage >= 50) message = '👻 Could be worse... literally';
-            else message = '⚰️ At least you tried before dying';
+        function monitorPlayerAnswers() {
+            const ref = db.ref('games/' + gameState.gameCode + '/players');
+            const check = () => {
+                ref.once('value').then((snap) => {
+                    const players = snap.val() || [];
+                    const allAnswered = players.every(p => p.answers && p.answers.some(a => a.question === gameState.currentQuestion));
 
-            scoreboard.innerHTML = `
-                <div class="scoreboard-item">
-                    <span class="rank">${message}</span>
-                </div>
-                <div class="scoreboard-item">
-                    <span class="player-name">${gameState.playerName}</span>
-                    <span class="player-score">${gameState.soloScore} / ${maxScore} pts</span>
-                </div>
-                <div class="scoreboard-item">
-                    <span style="font-size: 0.9em;">Accuracy: ${percentage}%</span>
-                </div>
-            `;
+                    document.getElementById('hostAnswersDisplay').innerHTML = players.map(p => {
+                        const answered = p.answers && p.answers.some(a => a.question === gameState.currentQuestion);
+                        return `<div class="player-item"><span class="player-name">${p.name}</span><span>${answered ? '✅' : '⏳'}</span></div>`;
+                    }).join('');
 
-            showScreen('resultsScreen');
+                    if (allAnswered || gameState.timeLeft <= 0) {
+                        clearInterval(gameState.timer);
+                        setTimeout(() => {
+                            if (gameState.currentQuestion < gameState.questions.length - 1) {
+                                document.getElementById('nextQuestionBtn').style.display = 'block';
+                            } else {
+                                document.getElementById('showResultsBtn').style.display = 'block';
+                            }
+                        }, 1000);
+                    } else {
+                        setTimeout(check, 500);
+                    }
+                });
+            };
+            check();
+        }
+
+        function nextQuestion() {
+            gameState.currentQuestion++;
+            db.ref('games/' + gameState.gameCode + '/currentQuestion').set(gameState.currentQuestion).then(() => showHostQuestion());
+        }
+
+        function showResults() {
+            db.ref('games/' + gameState.gameCode + '/players').once('value').then((snap) => {
+                const players = snap.val() || [];
+                const sorted = [...players].sort((a, b) => (b.score || 0) - (a.score || 0));
+                
+                document.getElementById('finalScoreboard').innerHTML = sorted.map((p, i) => {
+                    const medals = ['🥇', '🥈', '🥉'];
+                    return `<div class="scoreboard-item"><span class="rank">${medals[i] || ''} #${i + 1}</span><span class="player-name">${p.name}</span><span class="player-score">${p.score || 0} pts</span></div>`;
+                }).join('');
+
+                showScreen('resultsScreen');
+            });
+        }
+
+        function showPlayerResults() {
+            const check = setInterval(() => {
+                db.ref('games/' + gameState.gameCode + '/players').once('value').then((snap) => {
+                    const players = snap.val() || [];
+                    const allDone = players.every(p => p.answers && p.answers.length >= gameState.questions.length);
+                    if (allDone) {
+                        clearInterval(check);
+                        showResults();
+                    }
+                });
+            }, 1000);
         }
 
         function startTimer(role) {
             gameState.timeLeft = 15;
-            const timerElement = document.getElementById(role + 'Timer');
-            
+            const el = document.getElementById(role + 'Timer');
             clearInterval(gameState.timer);
             gameState.timer = setInterval(() => {
                 gameState.timeLeft--;
-                timerElement.textContent = gameState.timeLeft;
-                
-                if (gameState.timeLeft <= 5) {
-                    timerElement.classList.add('warning');
-                } else {
-                    timerElement.classList.remove('warning');
-                }
-                
+                el.textContent = gameState.timeLeft;
+                if (gameState.timeLeft <= 5) el.classList.add('warning');
+                else el.classList.remove('warning');
                 if (gameState.timeLeft <= 0) {
                     clearInterval(gameState.timer);
-                    if (role === 'solo') {
-                        selectSoloAnswer(-1);
-                    }
+                    if (role === 'player') selectAnswer(-1);
+                    if (role === 'solo') selectSoloAnswer(-1);
                 }
             }, 1000);
         }
+
+        // Solo mode (abbreviated)
+        function startSoloGame() {
+            const name = document.getElementById('soloPlayerName').value.trim();
+            const topic = document.getElementById('soloTopic').value;
+            if (!name) {alert('Enter name!'); return;}
+            gameState.playerName = name;
+            gameState.questions = darkQuestions[topic] ? [darkQuestions[topic][0]] : [];
+            gameState.currentQuestion = 0;
+            gameState.soloScore = 0;
+            document.getElementById('soloTopicDisplay').textContent = topic;
+            document.getElementById('soloTotalQuestions').textContent = gameState.questions.length;
+            document.getElementById('soloScore').textContent = '0';
+            showSoloQuestion();
+        }
+
+        function showSoloQuestion() {
+            const q = gameState.questions[gameState.currentQuestion];
+            document.getElementById('soloQuestionNumber').textContent = gameState.currentQuestion + 1;
+            document.getElementById('soloQuestionText').textContent = q.question;
+            document.getElementById('soloAnswerFeedback').innerHTML = '';
+            document.getElementById('soloOptions').innerHTML = q.options.map((opt, i) => `<button class="option-btn" onclick="selectSoloAnswer(${i})">${opt}</button>`).join('');
+            showScreen('soloGameScreen');
+            startTimer('solo');
+        }
+
+        function selectSoloAnswer(idx) {
+            clearInterval(gameState.timer);
+            const q = gameState.questions[gameState.currentQuestion];
+            const correct = idx === q.correct;
+            if (correct) {
+                const pts = 100 + (gameState.timeLeft * 10);
+                gameState.soloScore += pts;
+                document.getElementById('soloScore').textContent = gameState.soloScore;
+            }
+            const buttons = document.querySelectorAll('#soloOptions .option-btn');
+            buttons.forEach((btn, i) => {
+                btn.disabled = true;
+                if (i === q.correct) btn.classList.add('correct');
+                else if (i === idx && !correct) btn.classList.add('incorrect');
+            });
+            document.getElementById('soloAnswerFeedback').innerHTML = correct ? `✅ +${100 + (gameState.timeLeft * 10)}` : '❌';
+            setTimeout(() => {
+                gameState.currentQuestion++;
+                if (gameState.currentQuestion < gameState.questions.length) showSoloQuestion();
+                else showSoloResults();
+            }, 3000);
+        }
+
+        function showSoloResults() {
+            const max = gameState.questions.length * 250;
+            const pct = Math.round((gameState.soloScore / max) * 100);
+            let msg = pct >= 90 ? '🎭 Genius!' : pct >= 70 ? '💀 Great!' : pct >= 50 ? '👻 OK' : '⚰️ Try again';
+            document.getElementById('finalScoreboard').innerHTML = `<div class="scoreboard-item"><span class="rank">${msg}</span></div><div class="scoreboard-item"><span class="player-name">${gameState.playerName}</span><span class="player-score">${gameState.soloScore} / ${max}</span></div>`;
+            showScreen('resultsScreen');
+        }
+
+        // Load saved config
+        window.addEventListener('load', () => {
+            const saved = localStorage.getItem('firebaseConfig');
+            if (saved) {
+                try {
+                    const config = JSON.parse(saved);
+                    document.getElementById('apiKey').value = config.apiKey || '';
+                    document.getElementById('authDomain').value = config.authDomain || '';
+                    document.getElementById('databaseURL').value = config.databaseURL || '';
+                    document.getElementById('projectId').value = config.projectId || '';
+                    document.getElementById('storageBucket').value = config.storageBucket || '';
+                    document.getElementById('appId').value = config.appId || '';
+                } catch(e) {}
+            }
+        });
     </script>
 </body>
 </html>
