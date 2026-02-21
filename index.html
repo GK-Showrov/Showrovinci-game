@@ -378,61 +378,66 @@
 <body>
     <div class="container">
         <h1>🎭 ShowRovinci Show</h1>
-        <p class="subtitle">Instant Multiplayer Trivia - Zero Setup!</p>
-        
-        <div class="instant-badge">
-            ✨ Ready to Play! No Configuration Needed! ✨
-        </div>
+        <p class="subtitle" style="font-size: 1.2em; color: #f5576c;">Where smart people go to feel dumb! 🤡</p>
 
         <!-- Role Selection -->
         <div id="roleScreen" class="screen active">
-            <div class="info-box">
-                <strong>🎮 Choose Your Mode:</strong><br>
-                • <strong>Quick Play:</strong> Instant multiplayer with pre-loaded trivia<br>
-                • <strong>Custom Game:</strong> Create your own questions<br>
-                • <strong>Solo Mode:</strong> Play alone with dark questions
+            <div style="text-align: center; margin: 30px 0;">
+                <p style="font-size: 1.8em; font-weight: bold; color: #667eea; margin-bottom: 10px;">
+                    "I'm not saying I'm stupid, but..."
+                </p>
+                <p style="font-size: 1.3em; color: #666; font-style: italic;">
+                    ...let's see if you are! 🤪
+                </p>
             </div>
 
             <div class="role-selection">
                 <div class="role-card quick" onclick="selectQuickPlay()">
                     <div class="role-icon">⚡</div>
                     <h2>Quick Play</h2>
-                    <p>Instant multiplayer trivia!</p>
-                    <p style="font-size: 0.9em; margin-top: 10px;">Pre-loaded questions • Start in seconds</p>
+                    <p style="font-size: 1.1em; margin-top: 10px;">🎯 For the impatient</p>
                 </div>
 
                 <div class="role-card" onclick="selectRole('custom')">
-                    <div class="role-icon">👨‍💼</div>
+                    <div class="role-icon">🎨</div>
                     <h2>Custom Game</h2>
-                    <p>Host with your questions</p>
+                    <p style="font-size: 1.1em; margin-top: 10px;">🧠 Think you're clever?</p>
                 </div>
 
                 <div class="role-card solo" onclick="selectRole('solo')">
                     <div class="role-icon">💀</div>
                     <h2>Solo Mode</h2>
-                    <p>Dark trivia challenge</p>
+                    <p style="font-size: 1.1em; margin-top: 10px;">😈 Embrace the void</p>
                 </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 30px; padding: 20px; background: linear-gradient(135deg, #fff3cd 0%, #ffe5b4 100%); border-radius: 15px;">
+                <p style="font-size: 1.2em; color: #856404;">
+                    ⚠️ Warning: May cause excessive laughter, heated debates, and sudden realization of how little you actually know! 😂
+                </p>
             </div>
         </div>
 
         <!-- Quick Play Mode Selection -->
         <div id="quickPlayModeScreen" class="screen">
             <h2>⚡ Quick Play</h2>
-            <div class="info-box">
-                Join or create a game with pre-loaded general trivia questions!
+            <div style="text-align: center; margin: 20px 0;">
+                <p style="font-size: 1.3em; color: #667eea; font-style: italic;">
+                    "Too lazy to make questions? Perfect! 😎"
+                </p>
             </div>
 
             <div class="role-selection" style="max-width: 600px; margin: 0 auto;">
                 <div class="role-card" onclick="quickHost()">
                     <div class="role-icon">🎯</div>
                     <h2>Host Quick Game</h2>
-                    <p>Create instant game</p>
+                    <p>Be the boss!</p>
                 </div>
 
                 <div class="role-card" onclick="quickJoin()">
                     <div class="role-icon">🎮</div>
                     <h2>Join Quick Game</h2>
-                    <p>Enter game code</p>
+                    <p>Be the minion!</p>
                 </div>
             </div>
 
@@ -447,11 +452,11 @@
                 <input type="text" id="quickHostName" placeholder="Enter your name">
             </div>
             <div class="input-group">
-                <label>Number of Players:</label>
+                <label>Number of Players (2-5):</label>
                 <select id="quickMaxPlayers">
                     <option value="2">2 Players</option>
                     <option value="3">3 Players</option>
-                    <option value="4">4 Players</option>
+                    <option value="4" selected>4 Players</option>
                     <option value="5">5 Players</option>
                 </select>
             </div>
@@ -526,9 +531,11 @@
                 <input type="text" id="gameTopic" placeholder="Science, Movies, etc.">
             </div>
             <div class="input-group">
-                <label>Number of Players:</label>
+                <label>Number of Players (2-5):</label>
                 <select id="maxPlayers">
-                    <option value="4">4 Players</option>
+                    <option value="2">2 Players</option>
+                    <option value="3">3 Players</option>
+                    <option value="4" selected>4 Players</option>
                     <option value="5">5 Players</option>
                 </select>
             </div>
@@ -673,8 +680,18 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
     <script>
-        // EMBEDDED FIREBASE CONFIG - NO SETUP NEEDED!
-        // Note: This is a demo database. In production, use your own!
+        // ⚠️ IMPORTANT: REPLACE THESE WITH YOUR OWN FIREBASE CREDENTIALS! ⚠️
+        // These are placeholder values and WON'T WORK for multiplayer!
+        // 
+        // To make multiplayer work:
+        // 1. Go to https://console.firebase.google.com
+        // 2. Create a new project
+        // 3. Add a web app
+        // 4. Enable "Realtime Database" in TEST MODE
+        // 5. Copy your config values and paste them below
+        //
+        // Solo Mode works WITHOUT Firebase!
+        
         const firebaseConfig = {
             apiKey: "AIzaSyBXqFXs7RLw_Xw0M8VqGVqZxQ5pM5xU8HE",
             authDomain: "showrovinci-demo.firebaseapp.com",
