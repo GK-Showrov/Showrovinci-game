@@ -486,6 +486,7 @@
                 </p>
             </div>
             <button class="btn btn-success" onclick="startQuickPlayGame()" id="quickStartBtn" style="display: none;">🎮 Start Game!</button>
+            <button class="btn btn-secondary" onclick="location.reload()">Leave Lobby</button>
         </div>
 
         <!-- Custom Game Role Selection -->
@@ -578,6 +579,7 @@
             </div>
             <button class="btn btn-success" onclick="startQuestionCreation()" id="startGameBtn" disabled>Create Questions (need 2+ players)</button>
             <button class="btn btn-success" onclick="startQuickGameNow()" id="startQuickBtn" style="display: none;">Waiting for players... (0/2 min)</button>
+            <button class="btn btn-secondary" onclick="location.reload()">Cancel & Go Back</button>
         </div>
 
         <!-- Question Creation (for custom games) -->
@@ -649,6 +651,9 @@
             </div>
             <button class="btn btn-success" onclick="nextQuestion()" id="nextQuestionBtn" style="display: none;">Next Question</button>
             <button class="btn btn-success" onclick="showResults()" id="showResultsBtn" style="display: none;">Show Results</button>
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="btn btn-secondary" onclick="endGame()" style="width: auto; padding: 10px 20px;">End Game</button>
+            </div>
         </div>
 
         <!-- Player Game Screen -->
@@ -660,6 +665,9 @@
             <div class="timer" id="playerTimer">15</div>
             <div class="options-grid" id="playerOptions"></div>
             <div id="answerFeedback" style="text-align: center; margin-top: 20px; font-size: 1.5em; font-weight: bold;"></div>
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="btn btn-secondary" onclick="leaveGame()" style="width: auto; padding: 10px 20px;">Leave Game</button>
+            </div>
         </div>
 
         <!-- Solo Game Screen -->
@@ -689,18 +697,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
     <script>
-        // ⚠️ IMPORTANT: REPLACE THESE WITH YOUR OWN FIREBASE CREDENTIALS! ⚠️
-        // These are placeholder values and WON'T WORK for multiplayer!
-        // 
-        // To make multiplayer work:
-        // 1. Go to https://console.firebase.google.com
-        // 2. Create a new project
-        // 3. Add a web app
-        // 4. Enable "Realtime Database" in TEST MODE
-        // 5. Copy your config values and paste them below
-        //
-        // Solo Mode works WITHOUT Firebase!
-        
+        // Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyB4_Jvv6fx7amlZcAQE1SuFyvjZrhHrW1w",
             authDomain: "final-438de.firebaseapp.com",
@@ -934,6 +931,7 @@
             timeLeft: 15,
             soloScore: 0,
             isQuickPlay: false,
+            isCreator: false,
             listeners: []
         };
 
@@ -984,6 +982,7 @@
             gameState.isQuickPlay = true;
             gameState.topic = topic;
             gameState.questions = getRandomQuestions(topic, 10);
+            gameState.isCreator = true;
 
             db.ref('games/' + gameState.gameCode).set({
                 host: playerName,
@@ -1097,6 +1096,7 @@
                     ref.off('value', listener);
                     gameState.questions = game.questions;
                     gameState.currentQuestion = game.currentQuestion || 0;
+                    gameState.isCreator = gameState.players.find(p => p.name === gameState.playerName)?.isCreator || false;
                     showPlayerQuestion();
                 }
             });
@@ -1235,11 +1235,12 @@
                 const startBtn = document.getElementById('startGameBtn');
                 const quickBtn = document.getElementById('startQuickBtn');
                 
-                // Enable start button when at least 2 players join
+                // Enable start button when at least 2 players join OR allow host to create questions anytime
                 if (gameState.isQuickPlay) {
                     quickBtn.disabled = gameState.players.length < 2;
                 } else {
-                    startBtn.disabled = gameState.players.length < 2;
+                    // For custom games, host can always create questions
+                    startBtn.disabled = false;
                 }
                 
                 // Update button text to show player count
@@ -1250,9 +1251,11 @@
                 }
                 
                 if (!gameState.isQuickPlay && startBtn) {
-                    startBtn.textContent = gameState.players.length >= 2
-                        ? 'Create Questions (' + gameState.players.length + ' players ready)'
-                        : 'Waiting for players... (' + gameState.players.length + '/2 min)';
+                    if (gameState.players.length >= 2) {
+                        startBtn.textContent = 'Create Questions (' + gameState.players.length + ' players ready)';
+                    } else {
+                        startBtn.textContent = 'Create Questions (waiting for players: ' + gameState.players.length + '/2 min)';
+                    }
                 }
             });
             gameState.listeners.push({ref, listener});
@@ -1335,12 +1338,21 @@
                 return;
             }
 
-            db.ref('games/' + gameState.gameCode).update({
-                started: true,
-                currentQuestion: 0
-            }).then(() => {
-                gameState.currentQuestion = 0;
-                showHostQuestion();
+            // Check if at least 2 players
+            db.ref('games/' + gameState.gameCode + '/players').once('value').then((snap) => {
+                const players = snap.val() || [];
+                if (players.length < 2) {
+                    alert('Need at least 2 players to start the game! Currently: ' + players.length + ' player(s)');
+                    return;
+                }
+
+                db.ref('games/' + gameState.gameCode).update({
+                    started: true,
+                    currentQuestion: 0
+                }).then(() => {
+                    gameState.currentQuestion = 0;
+                    showHostQuestion();
+                });
             });
         }
 
@@ -1375,16 +1387,19 @@
             const ref = db.ref('games/' + gameState.gameCode + '/currentQuestion');
             const listener = ref.on('value', (snap) => {
                 const curr = snap.val();
-                if (curr > gameState.currentQuestion) {
+                if (curr !== null && curr > gameState.currentQuestion) {
                     ref.off('value', listener);
                     gameState.currentQuestion = curr;
                     if (gameState.currentQuestion < gameState.questions.length) {
                         setTimeout(() => showPlayerQuestion(), 100);
                     } else {
+                        // Game finished - show results
+                        ref.off('value', listener);
                         showPlayerResults();
                     }
                 }
             });
+            gameState.listeners.push({ref, listener});
         }
 
         function selectAnswer(idx) {
@@ -1417,6 +1432,33 @@
 
             const pts = correct ? (100 + (gameState.timeLeft * 10)) : 0;
             document.getElementById('answerFeedback').innerHTML = correct ? `✅ Correct! +${pts} pts` : '❌ Wrong!';
+            
+            // In Quick Play, check if all players answered and creator should advance
+            if (gameState.isQuickPlay && gameState.isCreator) {
+                setTimeout(() => {
+                    checkAndAdvanceQuickPlay();
+                }, 2000);
+            }
+        }
+
+        function checkAndAdvanceQuickPlay() {
+            db.ref('games/' + gameState.gameCode + '/players').once('value').then((snap) => {
+                const players = snap.val() || [];
+                const allAnswered = players.every(p => 
+                    p.answers && p.answers.some(a => a.question === gameState.currentQuestion)
+                );
+                
+                if (allAnswered) {
+                    // Move to next question
+                    const nextQ = gameState.currentQuestion + 1;
+                    if (nextQ < gameState.questions.length) {
+                        db.ref('games/' + gameState.gameCode + '/currentQuestion').set(nextQ);
+                    } else {
+                        // Game over - show results
+                        setTimeout(() => showResults(), 1000);
+                    }
+                }
+            });
         }
 
         function monitorPlayerAnswers() {
@@ -1478,6 +1520,23 @@
                     }
                 });
             }, 1000);
+        }
+
+        function leaveGame() {
+            if (confirm('Are you sure you want to leave the game?')) {
+                // Clear listeners
+                gameState.listeners.forEach(({ref, listener}) => {
+                    try { ref.off('value', listener); } catch(e) {}
+                });
+                location.reload();
+            }
+        }
+
+        function endGame() {
+            if (confirm('Are you sure you want to end the game for everyone?')) {
+                // Show results immediately
+                showResults();
+            }
         }
 
         function startTimer(role) {
