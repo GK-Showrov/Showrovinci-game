@@ -1,0 +1,1352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShowRovinci Show - Instant Multiplayer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 1200px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+
+        .instant-badge {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin: 10px 0;
+            width: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .btn-dark {
+            background: linear-gradient(135deg, #434343 0%, #000000 100%);
+        }
+
+        .role-selection {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .role-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.3s;
+            min-width: 250px;
+        }
+
+        .role-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .role-card.quick {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            color: white;
+        }
+
+        .role-card.solo {
+            background: linear-gradient(135deg, #434343 0%, #000000 100%);
+            color: white;
+        }
+
+        .role-icon {
+            font-size: 4em;
+            margin-bottom: 15px;
+        }
+
+        .input-group {
+            margin: 20px 0;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            color: #333;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .game-code {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            font-size: 2.5em;
+            font-weight: bold;
+            margin: 20px 0;
+            letter-spacing: 8px;
+        }
+
+        .players-list {
+            background: #f5f7fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .player-item {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .player-name {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .player-score {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .question-display {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .question-display.solo {
+            background: linear-gradient(135deg, #434343 0%, #000000 100%);
+        }
+
+        .question-text {
+            font-size: 1.5em;
+            margin-bottom: 30px;
+            line-height: 1.4;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .option-btn {
+            background: white;
+            color: #333;
+            padding: 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .option-btn.correct {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            color: white;
+        }
+
+        .option-btn.incorrect {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            color: white;
+        }
+
+        .timer {
+            font-size: 3em;
+            font-weight: bold;
+            text-align: center;
+            margin: 20px 0;
+            color: #667eea;
+        }
+
+        .timer.warning {
+            color: #f5576c;
+            animation: pulse 0.5s infinite;
+        }
+
+        .timer.solo {
+            color: #434343;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .scoreboard {
+            margin: 30px 0;
+        }
+
+        .scoreboard-item {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 20px;
+            margin: 10px 0;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.2em;
+        }
+
+        .rank {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+            min-width: 80px;
+        }
+
+        .topic-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            display: inline-block;
+            margin: 5px;
+        }
+
+        .topic-badge.solo {
+            background: linear-gradient(135deg, #434343 0%, #000000 100%);
+        }
+
+        .waiting-message {
+            text-align: center;
+            font-size: 1.5em;
+            color: #667eea;
+            margin: 40px 0;
+            animation: fadeInOut 2s infinite;
+        }
+
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .trophy {
+            font-size: 5em;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .solo-score-display {
+            text-align: center;
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+            margin: 20px 0;
+        }
+
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .role-selection {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎭 ShowRovinci Show</h1>
+        <p class="subtitle">Instant Multiplayer Trivia - Zero Setup!</p>
+        
+        <div class="instant-badge">
+            ✨ Ready to Play! No Configuration Needed! ✨
+        </div>
+
+        <!-- Role Selection -->
+        <div id="roleScreen" class="screen active">
+            <div class="info-box">
+                <strong>🎮 Choose Your Mode:</strong><br>
+                • <strong>Quick Play:</strong> Instant multiplayer with pre-loaded trivia<br>
+                • <strong>Custom Game:</strong> Create your own questions<br>
+                • <strong>Solo Mode:</strong> Play alone with dark questions
+            </div>
+
+            <div class="role-selection">
+                <div class="role-card quick" onclick="selectQuickPlay()">
+                    <div class="role-icon">⚡</div>
+                    <h2>Quick Play</h2>
+                    <p>Instant multiplayer trivia!</p>
+                    <p style="font-size: 0.9em; margin-top: 10px;">Pre-loaded questions • Start in seconds</p>
+                </div>
+
+                <div class="role-card" onclick="selectRole('custom')">
+                    <div class="role-icon">👨‍💼</div>
+                    <h2>Custom Game</h2>
+                    <p>Host with your questions</p>
+                </div>
+
+                <div class="role-card solo" onclick="selectRole('solo')">
+                    <div class="role-icon">💀</div>
+                    <h2>Solo Mode</h2>
+                    <p>Dark trivia challenge</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Play Mode Selection -->
+        <div id="quickPlayModeScreen" class="screen">
+            <h2>⚡ Quick Play</h2>
+            <div class="info-box">
+                Join or create a game with pre-loaded general trivia questions!
+            </div>
+
+            <div class="role-selection" style="max-width: 600px; margin: 0 auto;">
+                <div class="role-card" onclick="quickHost()">
+                    <div class="role-icon">🎯</div>
+                    <h2>Host Quick Game</h2>
+                    <p>Create instant game</p>
+                </div>
+
+                <div class="role-card" onclick="quickJoin()">
+                    <div class="role-icon">🎮</div>
+                    <h2>Join Quick Game</h2>
+                    <p>Enter game code</p>
+                </div>
+            </div>
+
+            <button class="btn btn-secondary" onclick="showScreen('roleScreen')">Back</button>
+        </div>
+
+        <!-- Quick Host Setup -->
+        <div id="quickHostScreen" class="screen">
+            <h2>⚡ Quick Play - Host</h2>
+            <div class="input-group">
+                <label>Your Name:</label>
+                <input type="text" id="quickHostName" placeholder="Enter your name">
+            </div>
+            <div class="input-group">
+                <label>Number of Players:</label>
+                <select id="quickMaxPlayers">
+                    <option value="2">2 Players</option>
+                    <option value="3">3 Players</option>
+                    <option value="4">4 Players</option>
+                    <option value="5">5 Players</option>
+                </select>
+            </div>
+            <button class="btn btn-success" onclick="createQuickGame()">Create Game</button>
+            <button class="btn btn-secondary" onclick="showScreen('quickPlayModeScreen')">Back</button>
+        </div>
+
+        <!-- Quick Join -->
+        <div id="quickJoinScreen" class="screen">
+            <h2>⚡ Quick Play - Join</h2>
+            <div class="input-group">
+                <label>Your Name:</label>
+                <input type="text" id="quickPlayerName" placeholder="Enter your name">
+            </div>
+            <div class="input-group">
+                <label>Game Code:</label>
+                <input type="text" id="quickGameCode" placeholder="6-digit code" maxlength="6">
+            </div>
+            <button class="btn btn-success" onclick="joinQuickGame()">Join Game</button>
+            <button class="btn btn-secondary" onclick="showScreen('quickPlayModeScreen')">Back</button>
+        </div>
+
+        <!-- Custom Game Role Selection -->
+        <div id="customRoleScreen" class="screen">
+            <h2>Custom Game</h2>
+            <div class="role-selection" style="max-width: 600px; margin: 0 auto;">
+                <div class="role-card" onclick="selectRole('host')">
+                    <div class="role-icon">👨‍💼</div>
+                    <h2>Host</h2>
+                    <p>Create your questions</p>
+                </div>
+
+                <div class="role-card" onclick="selectRole('player')">
+                    <div class="role-icon">🎮</div>
+                    <h2>Player</h2>
+                    <p>Join with code</p>
+                </div>
+            </div>
+            <button class="btn btn-secondary" onclick="showScreen('roleScreen')">Back</button>
+        </div>
+
+        <!-- Solo Setup -->
+        <div id="soloSetupScreen" class="screen">
+            <h2>💀 Solo Mode</h2>
+            <div class="input-group">
+                <label>Your Name:</label>
+                <input type="text" id="soloPlayerName" placeholder="Enter your name">
+            </div>
+            <div class="input-group">
+                <label>Choose Your Topic:</label>
+                <select id="soloTopic">
+                    <option value="existential">Existential Dread</option>
+                    <option value="dark_history">Dark History Facts</option>
+                    <option value="weird_deaths">Weird Ways to Die</option>
+                    <option value="conspiracy">Conspiracy Theories</option>
+                    <option value="apocalypse">End of the World</option>
+                </select>
+            </div>
+            <button class="btn btn-dark" onclick="startSoloGame()">Begin Your Suffering</button>
+            <button class="btn btn-secondary" onclick="showScreen('roleScreen')">Back</button>
+        </div>
+
+        <!-- Custom Host Setup -->
+        <div id="hostSetupScreen" class="screen">
+            <h2>Host Custom Game</h2>
+            <div class="input-group">
+                <label>Your Name:</label>
+                <input type="text" id="hostName" placeholder="Enter your name">
+            </div>
+            <div class="input-group">
+                <label>Game Topic:</label>
+                <input type="text" id="gameTopic" placeholder="Science, Movies, etc.">
+            </div>
+            <div class="input-group">
+                <label>Number of Players:</label>
+                <select id="maxPlayers">
+                    <option value="4">4 Players</option>
+                    <option value="5">5 Players</option>
+                </select>
+            </div>
+            <button class="btn" onclick="createGame()">Create Game</button>
+            <button class="btn btn-secondary" onclick="showScreen('customRoleScreen')">Back</button>
+        </div>
+
+        <!-- Player Join -->
+        <div id="playerJoinScreen" class="screen">
+            <h2>Join Custom Game</h2>
+            <div class="input-group">
+                <label>Your Name:</label>
+                <input type="text" id="playerName" placeholder="Enter your name">
+            </div>
+            <div class="input-group">
+                <label>Game Code:</label>
+                <input type="text" id="gameCode" placeholder="6-digit code" maxlength="6">
+            </div>
+            <button class="btn" onclick="joinGame()">Join Game</button>
+            <button class="btn btn-secondary" onclick="showScreen('customRoleScreen')">Back</button>
+        </div>
+
+        <!-- Host Lobby -->
+        <div id="hostLobbyScreen" class="screen">
+            <h2>Game Lobby</h2>
+            <div class="game-code" id="displayGameCode"></div>
+            <div class="topic-badge" id="displayTopic"></div>
+            <div class="players-list">
+                <h3>Players Joined (<span id="playerCount">0</span>/<span id="maxPlayerCount">4</span>)</h3>
+                <div id="lobbyPlayersList"></div>
+            </div>
+            <button class="btn btn-success" onclick="startQuestionCreation()" id="startGameBtn" disabled>Create Questions (need 2+ players)</button>
+            <button class="btn btn-success" onclick="startQuickGameNow()" id="startQuickBtn" style="display: none;">Waiting for players... (0/2 min)</button>
+        </div>
+
+        <!-- Question Creation (for custom games) -->
+        <div id="questionCreationScreen" class="screen">
+            <h2>Create Questions</h2>
+            <p>Topic: <span class="topic-badge" id="creationTopic"></span></p>
+            
+            <div style="background: #f5f7fa; padding: 25px; border-radius: 10px; margin: 20px 0;">
+                <div class="input-group">
+                    <label>Question:</label>
+                    <textarea id="questionText" rows="3" placeholder="Enter question"></textarea>
+                </div>
+                
+                <div class="input-group">
+                    <label>Options (select correct answer):</label>
+                    <div class="option-input" style="display: flex; gap: 10px; margin: 10px 0; align-items: center;">
+                        <input type="radio" name="correctAnswer" value="0" id="correct0" style="width: auto;">
+                        <input type="text" id="option0" placeholder="Option 1">
+                        <label for="correct0" style="display: inline; margin: 0;">✓</label>
+                    </div>
+                    <div class="option-input" style="display: flex; gap: 10px; margin: 10px 0; align-items: center;">
+                        <input type="radio" name="correctAnswer" value="1" id="correct1" style="width: auto;">
+                        <input type="text" id="option1" placeholder="Option 2">
+                        <label for="correct1" style="display: inline; margin: 0;">✓</label>
+                    </div>
+                    <div class="option-input" style="display: flex; gap: 10px; margin: 10px 0; align-items: center;">
+                        <input type="radio" name="correctAnswer" value="2" id="correct2" style="width: auto;">
+                        <input type="text" id="option2" placeholder="Option 3">
+                        <label for="correct2" style="display: inline; margin: 0;">✓</label>
+                    </div>
+                    <div class="option-input" style="display: flex; gap: 10px; margin: 10px 0; align-items: center;">
+                        <input type="radio" name="correctAnswer" value="3" id="correct3" style="width: auto;">
+                        <input type="text" id="option3" placeholder="Option 4">
+                        <label for="correct3" style="display: inline; margin: 0;">✓</label>
+                    </div>
+                </div>
+                
+                <button class="btn" onclick="addQuestion()">Add Question</button>
+            </div>
+
+            <div style="max-height: 400px; overflow-y: auto; margin: 20px 0;">
+                <h3>Questions Added (<span id="questionCount">0</span>)</h3>
+                <div id="questionsDisplay"></div>
+            </div>
+
+            <button class="btn btn-success" onclick="startGame()" id="startGameBtnFinal" disabled>Start Game (Min 5 questions)</button>
+        </div>
+
+        <!-- Player Waiting -->
+        <div id="playerWaitingScreen" class="screen">
+            <h2>Waiting for Game to Start</h2>
+            <div class="waiting-message">⏳ Host is preparing...</div>
+            <div class="players-list">
+                <h3>Players in Game:</h3>
+                <div id="waitingPlayersList"></div>
+            </div>
+        </div>
+
+        <!-- Host Game Screen -->
+        <div id="hostGameScreen" class="screen">
+            <h2>Question <span id="hostQuestionNumber">1</span></h2>
+            <div class="question-display">
+                <div class="question-text" id="hostQuestionText"></div>
+            </div>
+            <div class="timer" id="hostTimer">15</div>
+            <div class="players-list">
+                <h3>Player Answers:</h3>
+                <div id="hostAnswersDisplay"></div>
+            </div>
+            <button class="btn btn-success" onclick="nextQuestion()" id="nextQuestionBtn" style="display: none;">Next Question</button>
+            <button class="btn btn-success" onclick="showResults()" id="showResultsBtn" style="display: none;">Show Results</button>
+        </div>
+
+        <!-- Player Game Screen -->
+        <div id="playerGameScreen" class="screen">
+            <h2>Question <span id="playerQuestionNumber">1</span></h2>
+            <div class="question-display">
+                <div class="question-text" id="playerQuestionText"></div>
+            </div>
+            <div class="timer" id="playerTimer">15</div>
+            <div class="options-grid" id="playerOptions"></div>
+            <div id="answerFeedback" style="text-align: center; margin-top: 20px; font-size: 1.5em; font-weight: bold;"></div>
+        </div>
+
+        <!-- Solo Game Screen -->
+        <div id="soloGameScreen" class="screen">
+            <h2>Question <span id="soloQuestionNumber">1</span> of <span id="soloTotalQuestions">10</span></h2>
+            <div class="topic-badge solo" id="soloTopicDisplay"></div>
+            <div class="solo-score-display">Score: <span id="soloScore">0</span></div>
+            <div class="question-display solo">
+                <div class="question-text" id="soloQuestionText"></div>
+            </div>
+            <div class="timer solo" id="soloTimer">15</div>
+            <div class="options-grid" id="soloOptions"></div>
+            <div id="soloAnswerFeedback" style="text-align: center; margin-top: 20px; font-size: 1.5em; font-weight: bold;"></div>
+        </div>
+
+        <!-- Results Screen -->
+        <div id="resultsScreen" class="screen">
+            <div class="trophy">🏆</div>
+            <h2>Final Results</h2>
+            <div class="scoreboard" id="finalScoreboard"></div>
+            <button class="btn" onclick="location.reload()">New Game</button>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+    <script>
+        // EMBEDDED FIREBASE CONFIG - NO SETUP NEEDED!
+        // Note: This is a demo database. In production, use your own!
+        const firebaseConfig = {
+            apiKey: "AIzaSyBXqFXs7RLw_Xw0M8VqGVqZxQ5pM5xU8HE",
+            authDomain: "showrovinci-demo.firebaseapp.com",
+            databaseURL: "https://showrovinci-demo-default-rtdb.firebaseio.com",
+            projectId: "showrovinci-demo",
+            storageBucket: "showrovinci-demo.appspot.com",
+            appId: "1:123456789:web:abcdef123456"
+        };
+
+        // Initialize Firebase
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const db = firebase.database();
+
+        // Pre-loaded General Trivia Questions
+        const generalTriviaQuestions = [
+            {
+                question: "What is the capital of France?",
+                options: ["London", "Berlin", "Paris", "Madrid"],
+                correct: 2
+            },
+            {
+                question: "How many continents are there?",
+                options: ["5", "6", "7", "8"],
+                correct: 2
+            },
+            {
+                question: "What is the largest planet in our solar system?",
+                options: ["Mars", "Saturn", "Jupiter", "Neptune"],
+                correct: 2
+            },
+            {
+                question: "Who painted the Mona Lisa?",
+                options: ["Michelangelo", "Leonardo da Vinci", "Raphael", "Donatello"],
+                correct: 1
+            },
+            {
+                question: "What is the smallest country in the world?",
+                options: ["Monaco", "Vatican City", "San Marino", "Liechtenstein"],
+                correct: 1
+            },
+            {
+                question: "How many sides does a hexagon have?",
+                options: ["5", "6", "7", "8"],
+                correct: 1
+            },
+            {
+                question: "What is the chemical symbol for gold?",
+                options: ["Go", "Gd", "Au", "Ag"],
+                correct: 2
+            },
+            {
+                question: "Which ocean is the largest?",
+                options: ["Atlantic", "Indian", "Arctic", "Pacific"],
+                correct: 3
+            },
+            {
+                question: "What year did World War II end?",
+                options: ["1943", "1944", "1945", "1946"],
+                correct: 2
+            },
+            {
+                question: "How many bones are in the human body?",
+                options: ["186", "196", "206", "216"],
+                correct: 2
+            }
+        ];
+
+        // Dark Solo Questions
+        const darkQuestions = {
+            existential: [
+                {question: "What percentage of people who have ever lived are currently dead?", options: ["50%", "70%", "93%", "99%"], correct: 2},
+                {question: "How many years until the sun explodes?", options: ["1 billion", "5 billion", "10 billion", "Next Tuesday"], correct: 1},
+                {question: "What's the leading cause of death for water drinkers?", options: ["Drowning", "Death", "Water poisoning", "Existing"], correct: 1},
+                {question: "How long in space vacuum?", options: ["30 sec", "2 min", "5 min", "Long enough to regret"], correct: 3},
+                {question: "Spiders swallowed while sleeping?", options: ["0 (myth)", "8", "15", "Haunt your dreams"], correct: 0},
+                {question: "People dying per second globally?", options: ["0.5", "1.8", "5", "Not fast enough"], correct: 1},
+                {question: "What's inside a black hole?", options: ["Your hopes", "Your dreams", "Nobody knows", "All of the above"], correct: 3},
+                {question: "Heat death of universe?", options: ["10^100 years", "Forever", "Tomorrow 3pm", "Does it matter?"], correct: 0},
+                {question: "Body percentage that's bacteria?", options: ["1%", "10%", "50%", "Walking meat suit"], correct: 2},
+                {question: "Cells dying daily?", options: ["Thousands", "Millions", "Billions", "Different person"], correct: 2}
+            ],
+            dark_history: [
+                {question: "Great Wall deaths?", options: ["10k", "100k", "1M", "Buried in wall"], correct: 3},
+                {question: "Victorian hysteria cure?", options: ["Leeches", "Lobotomy", "Vibrators", "All at some point"], correct: 3},
+                {question: "Shortest war?", options: ["38 min", "2 hours", "1 day", "Longer than my relationship"], correct: 0},
+                {question: "Roman mouthwash?", options: ["Wine", "Urine", "Vinegar", "Enemy tears"], correct: 1},
+                {question: "Great Molasses Flood deaths?", options: ["0", "21", "100", "Sticky situation"], correct: 1},
+                {question: "Dancing Plague 1518?", options: ["Party", "Danced to death", "Medieval dance-off", "Worst flash mob"], correct: 1},
+                {question: "Chrysippus death?", options: ["Battle", "Laughing at joke", "Poison", "Old age boring"], correct: 1},
+                {question: "Before toilet paper?", options: ["Leaves", "Corn cobs", "Sponges on sticks", "All nightmares"], correct: 3},
+                {question: "Napoleon Moscow retreat deaths?", options: ["10k", "100k", "400k", "Paint snow red"], correct: 2},
+                {question: "Black Plague cure?", options: ["Bloodletting", "Whipping", "Mercury", "Everything except work"], correct: 3}
+            ],
+            weird_deaths: [
+                {question: "Aeschylus death?", options: ["Tortoise drop", "Poison", "Old age", "Writer's block"], correct: 0},
+                {question: "Vending machines vs sharks?", options: ["Sharks", "Vending machines", "Neither", "Trust issues"], correct: 1},
+                {question: "Segway inventor?", options: ["Car accident", "Rode Segway off cliff", "Natural", "Irony overload"], correct: 1},
+                {question: "Most likely death?", options: ["Heart disease", "Cancer", "Accident", "Embarrassment"], correct: 0},
+                {question: "Selfie deaths since 2011?", options: ["12", "50", "250+", "Not enough"], correct: 2},
+                {question: "Great Fire of London deaths?", options: ["6 deaths", "Starvation after", "Rebuild accidents", "Your expectations"], correct: 0},
+                {question: "Tennessee Williams?", options: ["Bottle cap choke", "Heart attack", "Car crash", "Poetic justice"], correct: 0},
+                {question: "Deadliest animal?", options: ["Sharks", "Lions", "Mosquitoes", "Other humans"], correct: 2},
+                {question: "Fall from bed deaths yearly?", options: ["10", "100", "450+", "Sweet dreams"], correct: 2},
+                {question: "Brandon Lee death?", options: ["Prop gun", "Stunt gone wrong", "Illness", "Family curse"], correct: 0}
+            ],
+            conspiracy: [
+                {question: "Flat earth edge?", options: ["Ice wall", "Waterfall", "Dreams", "Critical thinking"], correct: 0},
+                {question: "Moon landing fake believers?", options: ["5%", "10%", "20%", "Too many"], correct: 1},
+                {question: "Birds actually do?", options: ["Fly", "Sing", "Spy for gov", "Question existence"], correct: 2},
+                {question: "Inside Area 51?", options: ["Aliens", "Secret aircraft", "Nothing", "Your dad"], correct: 0},
+                {question: "9% Americans vs?", options: ["Grizzly", "Mike Tyson", "Gorilla", "Bad decisions"], correct: 0},
+                {question: "Contrails cause?", options: ["Water vapor", "Mind control", "Aliens", "Gov mixtape"], correct: 1},
+                {question: "Hollow Earth believers?", options: ["0.1%", "2%", "5%", "Hollow arguments"], correct: 1},
+                {question: "Dollar bill has?", options: ["Hidden symbols", "Secret messages", "World domination", "Inflation"], correct: 0},
+                {question: "Lizard people in gov?", options: ["4%", "12%", "20%", "Have you SEEN them?"], correct: 1},
+                {question: "5G towers do?", options: ["Internet", "Spread disease", "Mind control", "Judge search history"], correct: 1}
+            ],
+            apocalypse: [
+                {question: "Asteroid near-misses?", options: ["5", "20", "100+", "Sleep tight"], correct: 2},
+                {question: "Doomsday Clock at?", options: ["10 min", "5 min", "90 sec", "Who's counting"], correct: 2},
+                {question: "Nuclear weapons exist?", options: ["1k", "5k", "13k+", "Ruin everyone's day"], correct: 2},
+                {question: "Likely extinction cause?", options: ["Asteroids", "Climate change", "Nuclear war", "TikTok"], correct: 1},
+                {question: "Survive power grid fail?", options: ["1 week", "1 month", "6 months", "Canned food lasts"], correct: 1},
+                {question: "Species ever lived extinct?", options: ["50%", "75%", "99%", "Your turn coming"], correct: 2},
+                {question: "Overdue supervolcanoes?", options: ["0", "1", "7", "Yellowstone says hi"], correct: 2},
+                {question: "Yellowstone eruption?", options: ["Local damage", "Regional disaster", "Nuclear winter", "Bad vacation"], correct: 2},
+                {question: "Nuclear war survivors?", options: ["Billions", "Millions", "Thousands", "Cockroaches"], correct: 3},
+                {question: "Next ice age?", options: ["1k years", "10k years", "50k years", "After global warming"], correct: 2}
+            ]
+        };
+
+        let gameState = {
+            role: null,
+            gameCode: null,
+            players: [],
+            questions: [],
+            currentQuestion: 0,
+            topic: '',
+            maxPlayers: 4,
+            hostName: '',
+            playerName: '',
+            timer: null,
+            timeLeft: 15,
+            soloScore: 0,
+            isQuickPlay: false,
+            listeners: []
+        };
+
+        function showScreen(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
+        function selectQuickPlay() {
+            showScreen('quickPlayModeScreen');
+        }
+
+        function selectRole(role) {
+            if (role === 'solo') {
+                showScreen('soloSetupScreen');
+            } else if (role === 'custom') {
+                showScreen('customRoleScreen');
+            } else if (role === 'host') {
+                showScreen('hostSetupScreen');
+            } else if (role === 'player') {
+                showScreen('playerJoinScreen');
+            }
+        }
+
+        function quickHost() {
+            showScreen('quickHostScreen');
+        }
+
+        function quickJoin() {
+            showScreen('quickJoinScreen');
+        }
+
+        function generateGameCode() {
+            return Math.floor(100000 + Math.random() * 900000).toString();
+        }
+
+        function createQuickGame() {
+            const hostName = document.getElementById('quickHostName').value.trim();
+            const maxPlayers = parseInt(document.getElementById('quickMaxPlayers').value);
+
+            if (!hostName) {
+                alert('Please enter your name!');
+                return;
+            }
+
+            gameState.hostName = hostName;
+            gameState.maxPlayers = maxPlayers;
+            gameState.gameCode = generateGameCode();
+            gameState.isQuickPlay = true;
+            gameState.questions = generalTriviaQuestions;
+            gameState.topic = "General Trivia";
+
+            db.ref('games/' + gameState.gameCode).set({
+                host: hostName,
+                topic: "General Trivia",
+                maxPlayers: maxPlayers,
+                players: [],
+                questions: generalTriviaQuestions,
+                started: false,
+                currentQuestion: 0,
+                isQuickPlay: true
+            }).then(() => {
+                document.getElementById('displayGameCode').textContent = gameState.gameCode;
+                document.getElementById('displayTopic').textContent = "⚡ General Trivia";
+                document.getElementById('maxPlayerCount').textContent = maxPlayers;
+                document.getElementById('startQuickBtn').style.display = 'block';
+                document.getElementById('startGameBtn').style.display = 'none';
+                showScreen('hostLobbyScreen');
+                listenToLobby();
+            }).catch(error => alert('Error: ' + error.message));
+        }
+
+        function joinQuickGame() {
+            const playerName = document.getElementById('quickPlayerName').value.trim();
+            const gameCode = document.getElementById('quickGameCode').value.trim();
+
+            if (!playerName || !gameCode) {
+                alert('Please fill in all fields!');
+                return;
+            }
+
+            joinGameWithCode(playerName, gameCode);
+        }
+
+        function startQuickGameNow() {
+            // Allow starting with any number of players (including 1 for testing, but button disabled until 2)
+            db.ref('games/' + gameState.gameCode).update({
+                started: true,
+                currentQuestion: 0
+            }).then(() => {
+                gameState.currentQuestion = 0;
+                showHostQuestion();
+            });
+        }
+
+        function createGame() {
+            const hostName = document.getElementById('hostName').value.trim();
+            const topic = document.getElementById('gameTopic').value.trim();
+            const maxPlayers = parseInt(document.getElementById('maxPlayers').value);
+
+            if (!hostName || !topic) {
+                alert('Please fill in all fields!');
+                return;
+            }
+
+            gameState.hostName = hostName;
+            gameState.topic = topic;
+            gameState.maxPlayers = maxPlayers;
+            gameState.gameCode = generateGameCode();
+            gameState.isQuickPlay = false;
+
+            db.ref('games/' + gameState.gameCode).set({
+                host: hostName,
+                topic: topic,
+                maxPlayers: maxPlayers,
+                players: [],
+                questions: [],
+                started: false,
+                currentQuestion: 0,
+                isQuickPlay: false
+            }).then(() => {
+                document.getElementById('displayGameCode').textContent = gameState.gameCode;
+                document.getElementById('displayTopic').textContent = topic;
+                document.getElementById('maxPlayerCount').textContent = maxPlayers;
+                document.getElementById('startGameBtn').style.display = 'block';
+                document.getElementById('startQuickBtn').style.display = 'none';
+                showScreen('hostLobbyScreen');
+                listenToLobby();
+            }).catch(error => alert('Error: ' + error.message));
+        }
+
+        function joinGame() {
+            const playerName = document.getElementById('playerName').value.trim();
+            const gameCode = document.getElementById('gameCode').value.trim();
+
+            if (!playerName || !gameCode) {
+                alert('Please fill in all fields!');
+                return;
+            }
+
+            joinGameWithCode(playerName, gameCode);
+        }
+
+        function joinGameWithCode(playerName, gameCode) {
+            const ref = db.ref('games/' + gameCode);
+            ref.once('value').then((snap) => {
+                const game = snap.val();
+                
+                if (!game) {
+                    alert('Game not found! Check the code.');
+                    return;
+                }
+
+                if ((game.players || []).length >= game.maxPlayers) {
+                    alert('Game is full!');
+                    return;
+                }
+
+                if (game.started) {
+                    alert('Game already started!');
+                    return;
+                }
+
+                if ((game.players || []).some(p => p.name === playerName)) {
+                    alert('Name already taken!');
+                    return;
+                }
+
+                gameState.playerName = playerName;
+                gameState.gameCode = gameCode;
+                gameState.topic = game.topic;
+                gameState.isQuickPlay = game.isQuickPlay || false;
+
+                const players = game.players || [];
+                players.push({name: playerName, score: 0, answers: []});
+
+                ref.update({players}).then(() => {
+                    showScreen('playerWaitingScreen');
+                    listenToPlayerWaiting();
+                });
+            });
+        }
+
+        function listenToLobby() {
+            const ref = db.ref('games/' + gameState.gameCode);
+            const listener = ref.on('value', (snap) => {
+                const game = snap.val();
+                if (!game) return;
+
+                gameState.players = game.players || [];
+                document.getElementById('playerCount').textContent = gameState.players.length;
+                document.getElementById('lobbyPlayersList').innerHTML = gameState.players.map(p => `
+                    <div class="player-item">
+                        <span class="player-name">🎮 ${p.name}</span>
+                        <span style="color: #43e97b;">✓ Ready</span>
+                    </div>
+                `).join('');
+
+                const startBtn = document.getElementById('startGameBtn');
+                const quickBtn = document.getElementById('startQuickBtn');
+                
+                // Enable start button when at least 2 players join
+                if (gameState.isQuickPlay) {
+                    quickBtn.disabled = gameState.players.length < 2;
+                } else {
+                    startBtn.disabled = gameState.players.length < 2;
+                }
+                
+                // Update button text to show player count
+                if (gameState.isQuickPlay && quickBtn) {
+                    quickBtn.textContent = gameState.players.length >= 2 
+                        ? 'Start Game Now! (' + gameState.players.length + ' players)' 
+                        : 'Waiting for players... (' + gameState.players.length + '/2 min)';
+                }
+                
+                if (!gameState.isQuickPlay && startBtn) {
+                    startBtn.textContent = gameState.players.length >= 2
+                        ? 'Create Questions (' + gameState.players.length + ' players ready)'
+                        : 'Waiting for players... (' + gameState.players.length + '/2 min)';
+                }
+            });
+            gameState.listeners.push({ref, listener});
+        }
+
+        function listenToPlayerWaiting() {
+            const ref = db.ref('games/' + gameState.gameCode);
+            const listener = ref.on('value', (snap) => {
+                const game = snap.val();
+                if (!game) return;
+
+                gameState.players = game.players || [];
+                document.getElementById('waitingPlayersList').innerHTML = gameState.players.map(p => `
+                    <div class="player-item"><span class="player-name">🎮 ${p.name}</span></div>
+                `).join('');
+
+                if (game.started && game.questions && game.questions.length > 0) {
+                    ref.off('value', listener);
+                    gameState.questions = game.questions;
+                    gameState.currentQuestion = game.currentQuestion || 0;
+                    showPlayerQuestion();
+                }
+            });
+            gameState.listeners.push({ref, listener});
+        }
+
+        function startQuestionCreation() {
+            document.getElementById('creationTopic').textContent = gameState.topic;
+            showScreen('questionCreationScreen');
+        }
+
+        function addQuestion() {
+            const questionText = document.getElementById('questionText').value.trim();
+            const options = [
+                document.getElementById('option0').value.trim(),
+                document.getElementById('option1').value.trim(),
+                document.getElementById('option2').value.trim(),
+                document.getElementById('option3').value.trim()
+            ];
+            const correctAnswer = document.querySelector('input[name="correctAnswer"]:checked');
+
+            if (!questionText || options.some(o => !o) || !correctAnswer) {
+                alert('Please fill all fields and select correct answer!');
+                return;
+            }
+
+            gameState.questions.push({
+                question: questionText,
+                options: options,
+                correct: parseInt(correctAnswer.value)
+            });
+            
+            db.ref('games/' + gameState.gameCode + '/questions').set(gameState.questions);
+
+            document.getElementById('questionText').value = '';
+            document.getElementById('option0').value = '';
+            document.getElementById('option1').value = '';
+            document.getElementById('option2').value = '';
+            document.getElementById('option3').value = '';
+            document.querySelectorAll('input[name="correctAnswer"]').forEach(r => r.checked = false);
+
+            updateQuestionsDisplay();
+        }
+
+        function updateQuestionsDisplay() {
+            document.getElementById('questionCount').textContent = gameState.questions.length;
+            document.getElementById('questionsDisplay').innerHTML = gameState.questions.map((q, i) => `
+                <div style="background: white; padding: 15px; margin: 10px 0; border-radius: 8px; border-left: 4px solid #667eea;">
+                    <strong>Q${i + 1}:</strong> ${q.question}<br>
+                    <small>Correct: ${q.options[q.correct]}</small>
+                </div>
+            `).join('');
+
+            document.getElementById('startGameBtnFinal').disabled = gameState.questions.length < 5;
+        }
+
+        function startGame() {
+            if (gameState.questions.length < 5) {
+                alert('Need at least 5 questions!');
+                return;
+            }
+
+            db.ref('games/' + gameState.gameCode).update({
+                started: true,
+                currentQuestion: 0
+            }).then(() => {
+                gameState.currentQuestion = 0;
+                showHostQuestion();
+            });
+        }
+
+        function showHostQuestion() {
+            const question = gameState.questions[gameState.currentQuestion];
+            document.getElementById('hostQuestionNumber').textContent = gameState.currentQuestion + 1;
+            document.getElementById('hostQuestionText').textContent = question.question;
+            document.getElementById('nextQuestionBtn').style.display = 'none';
+            document.getElementById('showResultsBtn').style.display = 'none';
+            
+            showScreen('hostGameScreen');
+            startTimer('host');
+            monitorPlayerAnswers();
+        }
+
+        function showPlayerQuestion() {
+            const question = gameState.questions[gameState.currentQuestion];
+            document.getElementById('playerQuestionNumber').textContent = gameState.currentQuestion + 1;
+            document.getElementById('playerQuestionText').textContent = question.question;
+            document.getElementById('answerFeedback').innerHTML = '';
+            
+            document.getElementById('playerOptions').innerHTML = question.options.map((opt, i) => `
+                <button class="option-btn" onclick="selectAnswer(${i})">${opt}</button>
+            `).join('');
+
+            showScreen('playerGameScreen');
+            startTimer('player');
+            listenForNextQuestion();
+        }
+
+        function listenForNextQuestion() {
+            const ref = db.ref('games/' + gameState.gameCode + '/currentQuestion');
+            const listener = ref.on('value', (snap) => {
+                const curr = snap.val();
+                if (curr > gameState.currentQuestion) {
+                    ref.off('value', listener);
+                    gameState.currentQuestion = curr;
+                    if (gameState.currentQuestion < gameState.questions.length) {
+                        setTimeout(() => showPlayerQuestion(), 100);
+                    } else {
+                        showPlayerResults();
+                    }
+                }
+            });
+        }
+
+        function selectAnswer(idx) {
+            clearInterval(gameState.timer);
+            const question = gameState.questions[gameState.currentQuestion];
+            const correct = idx === question.correct;
+            
+            db.ref('games/' + gameState.gameCode + '/players').once('value').then((snap) => {
+                const players = snap.val() || [];
+                const pIdx = players.findIndex(p => p.name === gameState.playerName);
+                
+                if (pIdx !== -1) {
+                    if (!players[pIdx].answers) players[pIdx].answers = [];
+                    if (players[pIdx].answers.some(a => a.question === gameState.currentQuestion)) return;
+                    
+                    const pts = correct ? (100 + (gameState.timeLeft * 10)) : 0;
+                    players[pIdx].answers.push({question: gameState.currentQuestion, answer: idx, correct, time: gameState.timeLeft, points: pts});
+                    players[pIdx].score = (players[pIdx].score || 0) + pts;
+                    
+                    db.ref('games/' + gameState.gameCode + '/players').set(players);
+                }
+            });
+
+            const buttons = document.querySelectorAll('.option-btn');
+            buttons.forEach((btn, i) => {
+                btn.disabled = true;
+                if (i === question.correct) btn.classList.add('correct');
+                else if (i === idx && !correct) btn.classList.add('incorrect');
+            });
+
+            const pts = correct ? (100 + (gameState.timeLeft * 10)) : 0;
+            document.getElementById('answerFeedback').innerHTML = correct ? `✅ Correct! +${pts} pts` : '❌ Wrong!';
+        }
+
+        function monitorPlayerAnswers() {
+            const ref = db.ref('games/' + gameState.gameCode + '/players');
+            const check = () => {
+                ref.once('value').then((snap) => {
+                    const players = snap.val() || [];
+                    const allAnswered = players.every(p => p.answers && p.answers.some(a => a.question === gameState.currentQuestion));
+
+                    document.getElementById('hostAnswersDisplay').innerHTML = players.map(p => {
+                        const answered = p.answers && p.answers.some(a => a.question === gameState.currentQuestion);
+                        return `<div class="player-item"><span class="player-name">${p.name}</span><span>${answered ? '✅ Answered' : '⏳ Thinking...'}</span></div>`;
+                    }).join('');
+
+                    if (allAnswered || gameState.timeLeft <= 0) {
+                        clearInterval(gameState.timer);
+                        setTimeout(() => {
+                            if (gameState.currentQuestion < gameState.questions.length - 1) {
+                                document.getElementById('nextQuestionBtn').style.display = 'block';
+                            } else {
+                                document.getElementById('showResultsBtn').style.display = 'block';
+                            }
+                        }, 1000);
+                    } else {
+                        setTimeout(check, 500);
+                    }
+                });
+            };
+            check();
+        }
+
+        function nextQuestion() {
+            gameState.currentQuestion++;
+            db.ref('games/' + gameState.gameCode + '/currentQuestion').set(gameState.currentQuestion).then(() => showHostQuestion());
+        }
+
+        function showResults() {
+            db.ref('games/' + gameState.gameCode + '/players').once('value').then((snap) => {
+                const players = snap.val() || [];
+                const sorted = [...players].sort((a, b) => (b.score || 0) - (a.score || 0));
+                
+                document.getElementById('finalScoreboard').innerHTML = sorted.map((p, i) => {
+                    const medals = ['🥇', '🥈', '🥉'];
+                    return `<div class="scoreboard-item"><span class="rank">${medals[i] || ''} #${i + 1}</span><span class="player-name">${p.name}</span><span class="player-score">${p.score || 0} pts</span></div>`;
+                }).join('');
+
+                showScreen('resultsScreen');
+            });
+        }
+
+        function showPlayerResults() {
+            const check = setInterval(() => {
+                db.ref('games/' + gameState.gameCode + '/players').once('value').then((snap) => {
+                    const players = snap.val() || [];
+                    const allDone = players.every(p => p.answers && p.answers.length >= gameState.questions.length);
+                    if (allDone) {
+                        clearInterval(check);
+                        showResults();
+                    }
+                });
+            }, 1000);
+        }
+
+        function startTimer(role) {
+            gameState.timeLeft = 15;
+            const el = document.getElementById(role + 'Timer');
+            clearInterval(gameState.timer);
+            gameState.timer = setInterval(() => {
+                gameState.timeLeft--;
+                el.textContent = gameState.timeLeft;
+                if (gameState.timeLeft <= 5) el.classList.add('warning');
+                else el.classList.remove('warning');
+                if (gameState.timeLeft <= 0) {
+                    clearInterval(gameState.timer);
+                    if (role === 'player') selectAnswer(-1);
+                    if (role === 'solo') selectSoloAnswer(-1);
+                }
+            }, 1000);
+        }
+
+        // Solo Mode
+        function startSoloGame() {
+            const name = document.getElementById('soloPlayerName').value.trim();
+            const topic = document.getElementById('soloTopic').value;
+            if (!name) {alert('Enter your name!'); return;}
+            gameState.playerName = name;
+            gameState.questions = darkQuestions[topic] || [];
+            gameState.currentQuestion = 0;
+            gameState.soloScore = 0;
+            const topicNames = {
+                existential: 'Existential Dread',
+                dark_history: 'Dark History',
+                weird_deaths: 'Weird Deaths',
+                conspiracy: 'Conspiracies',
+                apocalypse: 'Apocalypse'
+            };
+            document.getElementById('soloTopicDisplay').textContent = topicNames[topic];
+            document.getElementById('soloTotalQuestions').textContent = gameState.questions.length;
+            document.getElementById('soloScore').textContent = '0';
+            showSoloQuestion();
+        }
+
+        function showSoloQuestion() {
+            const q = gameState.questions[gameState.currentQuestion];
+            document.getElementById('soloQuestionNumber').textContent = gameState.currentQuestion + 1;
+            document.getElementById('soloQuestionText').textContent = q.question;
+            document.getElementById('soloAnswerFeedback').innerHTML = '';
+            document.getElementById('soloOptions').innerHTML = q.options.map((opt, i) => `<button class="option-btn" onclick="selectSoloAnswer(${i})">${opt}</button>`).join('');
+            showScreen('soloGameScreen');
+            startTimer('solo');
+        }
+
+        function selectSoloAnswer(idx) {
+            clearInterval(gameState.timer);
+            const q = gameState.questions[gameState.currentQuestion];
+            const correct = idx === q.correct;
+            if (correct) {
+                const pts = 100 + (gameState.timeLeft * 10);
+                gameState.soloScore += pts;
+                document.getElementById('soloScore').textContent = gameState.soloScore;
+            }
+            const buttons = document.querySelectorAll('#soloOptions .option-btn');
+            buttons.forEach((btn, i) => {
+                btn.disabled = true;
+                if (i === q.correct) btn.classList.add('correct');
+                else if (i === idx && !correct) btn.classList.add('incorrect');
+            });
+            document.getElementById('soloAnswerFeedback').innerHTML = correct ? `✅ +${100 + (gameState.timeLeft * 10)}` : '❌ Wrong!';
+            setTimeout(() => {
+                gameState.currentQuestion++;
+                if (gameState.currentQuestion < gameState.questions.length) showSoloQuestion();
+                else showSoloResults();
+            }, 3000);
+        }
+
+        function showSoloResults() {
+            const max = gameState.questions.length * 250;
+            const pct = Math.round((gameState.soloScore / max) * 100);
+            let msg = pct >= 90 ? '🎭 Dark Genius!' : pct >= 70 ? '💀 Impressive!' : pct >= 50 ? '👻 Not bad' : '⚰️ Try again';
+            document.getElementById('finalScoreboard').innerHTML = `<div class="scoreboard-item"><span class="rank">${msg}</span></div><div class="scoreboard-item"><span class="player-name">${gameState.playerName}</span><span class="player-score">${gameState.soloScore} / ${max} pts</span></div>`;
+            showScreen('resultsScreen');
+        }
+    </script>
+</body>
+</html>
