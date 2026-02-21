@@ -423,60 +423,69 @@
             <h2>⚡ Quick Play</h2>
             <div style="text-align: center; margin: 20px 0;">
                 <p style="font-size: 1.3em; color: #667eea; font-style: italic;">
-                    "Too lazy to make questions? Perfect! 😎"
+                    "Pick a topic and let's see who's the smartest idiot! 😎"
                 </p>
             </div>
 
-            <div class="role-selection" style="max-width: 600px; margin: 0 auto;">
-                <div class="role-card" onclick="quickHost()">
-                    <div class="role-icon">🎯</div>
-                    <h2>Host Quick Game</h2>
-                    <p>Be the boss!</p>
-                </div>
-
-                <div class="role-card" onclick="quickJoin()">
-                    <div class="role-icon">🎮</div>
-                    <h2>Join Quick Game</h2>
-                    <p>Be the minion!</p>
-                </div>
-            </div>
-
-            <button class="btn btn-secondary" onclick="showScreen('roleScreen')">Back</button>
-        </div>
-
-        <!-- Quick Host Setup -->
-        <div id="quickHostScreen" class="screen">
-            <h2>⚡ Quick Play - Host</h2>
             <div class="input-group">
                 <label>Your Name:</label>
-                <input type="text" id="quickHostName" placeholder="Enter your name">
+                <input type="text" id="quickPlayerName" placeholder="Enter your name">
             </div>
+
+            <div class="input-group">
+                <label>Choose Topic:</label>
+                <select id="quickTopicSelect">
+                    <option value="general">🌍 General Knowledge</option>
+                    <option value="sports">⚽ Sports</option>
+                    <option value="geography">🗺️ Geography</option>
+                    <option value="movies">🎬 Movies & TV</option>
+                    <option value="entertainment">🎭 Entertainment</option>
+                    <option value="colors">🎨 What Color Is It?</option>
+                    <option value="science">🔬 Science</option>
+                    <option value="history">📜 History</option>
+                </select>
+            </div>
+
             <div class="input-group">
                 <label>Number of Players (2-5):</label>
-                <select id="quickMaxPlayers">
+                <select id="quickPlayersCount">
                     <option value="2">2 Players</option>
                     <option value="3">3 Players</option>
                     <option value="4" selected>4 Players</option>
                     <option value="5">5 Players</option>
                 </select>
             </div>
-            <button class="btn btn-success" onclick="createQuickGame()">Create Game</button>
-            <button class="btn btn-secondary" onclick="showScreen('quickPlayModeScreen')">Back</button>
+
+            <button class="btn btn-success" onclick="createQuickRoom()">🎯 Create Game Room</button>
+            
+            <div style="text-align: center; margin: 30px 0;">
+                <p style="font-size: 1.1em; color: #666;">OR</p>
+            </div>
+
+            <div class="input-group">
+                <label>Join Existing Game:</label>
+                <input type="text" id="quickJoinCode" placeholder="Enter 6-digit code" maxlength="6">
+            </div>
+
+            <button class="btn" onclick="joinQuickRoom()">Join Game Room</button>
+            <button class="btn btn-secondary" onclick="showScreen('roleScreen')">Back</button>
         </div>
 
-        <!-- Quick Join -->
-        <div id="quickJoinScreen" class="screen">
-            <h2>⚡ Quick Play - Join</h2>
-            <div class="input-group">
-                <label>Your Name:</label>
-                <input type="text" id="quickPlayerName" placeholder="Enter your name">
+        <!-- Quick Play Lobby (waiting for all players) -->
+        <div id="quickLobbyScreen" class="screen">
+            <h2>⚡ Quick Play Lobby</h2>
+            <div class="game-code" id="quickGameCode"></div>
+            <div class="topic-badge" id="quickTopicDisplay"></div>
+            <div class="players-list">
+                <h3>Players (<span id="quickPlayerCount">0</span>/<span id="quickMaxPlayers">4</span>)</h3>
+                <div id="quickLobbyPlayers"></div>
             </div>
-            <div class="input-group">
-                <label>Game Code:</label>
-                <input type="text" id="quickGameCode" placeholder="6-digit code" maxlength="6">
+            <div style="text-align: center; margin: 20px 0;">
+                <p style="font-size: 1.2em; color: #667eea;">
+                    <span id="quickWaitingMsg">Waiting for players to join...</span>
+                </p>
             </div>
-            <button class="btn btn-success" onclick="joinQuickGame()">Join Game</button>
-            <button class="btn btn-secondary" onclick="showScreen('quickPlayModeScreen')">Back</button>
+            <button class="btn btn-success" onclick="startQuickPlayGame()" id="quickStartBtn" style="display: none;">🎮 Start Game!</button>
         </div>
 
         <!-- Custom Game Role Selection -->
@@ -707,59 +716,145 @@
         }
         const db = firebase.database();
 
-        // Pre-loaded General Trivia Questions
-        const generalTriviaQuestions = [
-            {
-                question: "What is the capital of France?",
-                options: ["London", "Berlin", "Paris", "Madrid"],
-                correct: 2
-            },
-            {
-                question: "How many continents are there?",
-                options: ["5", "6", "7", "8"],
-                correct: 2
-            },
-            {
-                question: "What is the largest planet in our solar system?",
-                options: ["Mars", "Saturn", "Jupiter", "Neptune"],
-                correct: 2
-            },
-            {
-                question: "Who painted the Mona Lisa?",
-                options: ["Michelangelo", "Leonardo da Vinci", "Raphael", "Donatello"],
-                correct: 1
-            },
-            {
-                question: "What is the smallest country in the world?",
-                options: ["Monaco", "Vatican City", "San Marino", "Liechtenstein"],
-                correct: 1
-            },
-            {
-                question: "How many sides does a hexagon have?",
-                options: ["5", "6", "7", "8"],
-                correct: 1
-            },
-            {
-                question: "What is the chemical symbol for gold?",
-                options: ["Go", "Gd", "Au", "Ag"],
-                correct: 2
-            },
-            {
-                question: "Which ocean is the largest?",
-                options: ["Atlantic", "Indian", "Arctic", "Pacific"],
-                correct: 3
-            },
-            {
-                question: "What year did World War II end?",
-                options: ["1943", "1944", "1945", "1946"],
-                correct: 2
-            },
-            {
-                question: "How many bones are in the human body?",
-                options: ["186", "196", "206", "216"],
-                correct: 2
-            }
-        ];
+        // Pre-loaded Quick Play Questions by Topic
+        const quickPlayQuestions = {
+            general: [
+                {question: "What is the capital of France?", options: ["London", "Berlin", "Paris", "Madrid"], correct: 2},
+                {question: "How many continents are there?", options: ["5", "6", "7", "8"], correct: 2},
+                {question: "What is the largest planet in our solar system?", options: ["Mars", "Saturn", "Jupiter", "Neptune"], correct: 2},
+                {question: "Who painted the Mona Lisa?", options: ["Michelangelo", "Leonardo da Vinci", "Raphael", "Donatello"], correct: 1},
+                {question: "What is the smallest country in the world?", options: ["Monaco", "Vatican City", "San Marino", "Liechtenstein"], correct: 1},
+                {question: "How many sides does a hexagon have?", options: ["5", "6", "7", "8"], correct: 1},
+                {question: "What is the chemical symbol for gold?", options: ["Go", "Gd", "Au", "Ag"], correct: 2},
+                {question: "Which ocean is the largest?", options: ["Atlantic", "Indian", "Arctic", "Pacific"], correct: 3},
+                {question: "What year did World War II end?", options: ["1943", "1944", "1945", "1946"], correct: 2},
+                {question: "How many bones are in the human body?", options: ["186", "196", "206", "216"], correct: 2},
+                {question: "What is the speed of light?", options: ["300,000 km/s", "150,000 km/s", "450,000 km/s", "600,000 km/s"], correct: 0},
+                {question: "Who wrote Romeo and Juliet?", options: ["Charles Dickens", "William Shakespeare", "Jane Austen", "Mark Twain"], correct: 1},
+                {question: "What is the tallest mountain?", options: ["K2", "Kilimanjaro", "Mount Everest", "Denali"], correct: 2},
+                {question: "How many hours in a day?", options: ["20", "22", "24", "26"], correct: 2},
+                {question: "What is H2O?", options: ["Oxygen", "Hydrogen", "Water", "Carbon dioxide"], correct: 2}
+            ],
+            sports: [
+                {question: "How many players in a soccer team?", options: ["9", "10", "11", "12"], correct: 2},
+                {question: "Which sport uses a puck?", options: ["Baseball", "Ice hockey", "Cricket", "Tennis"], correct: 1},
+                {question: "How many rings on Olympic flag?", options: ["4", "5", "6", "7"], correct: 1},
+                {question: "In which sport can you get a hole-in-one?", options: ["Tennis", "Golf", "Basketball", "Baseball"], correct: 1},
+                {question: "What do you call a score of zero in tennis?", options: ["Nothing", "Zero", "Love", "Nil"], correct: 2},
+                {question: "How many points is a touchdown in NFL?", options: ["4", "5", "6", "7"], correct: 2},
+                {question: "Which country won the 2018 FIFA World Cup?", options: ["Germany", "Brazil", "France", "Argentina"], correct: 2},
+                {question: "How many strikes for an out in baseball?", options: ["2", "3", "4", "5"], correct: 1},
+                {question: "What sport is Wimbledon famous for?", options: ["Golf", "Cricket", "Tennis", "Soccer"], correct: 2},
+                {question: "How many players in a basketball team on court?", options: ["4", "5", "6", "7"], correct: 1},
+                {question: "Which sport uses the term 'checkmate'?", options: ["Chess", "Checkers", "Poker", "Bridge"], correct: 0},
+                {question: "What color is the center of an archery target?", options: ["Red", "Yellow", "Blue", "Black"], correct: 1},
+                {question: "In boxing, what does KO stand for?", options: ["Kick Out", "Knock Out", "Keep On", "Kill Opponent"], correct: 1},
+                {question: "How long is a marathon?", options: ["26.2 miles", "20 miles", "30 miles", "25 miles"], correct: 0},
+                {question: "What sport is 'The Masters' tournament?", options: ["Tennis", "Baseball", "Golf", "Boxing"], correct: 2}
+            ],
+            geography: [
+                {question: "What is the capital of Japan?", options: ["Beijing", "Seoul", "Tokyo", "Bangkok"], correct: 2},
+                {question: "Which river is the longest?", options: ["Amazon", "Nile", "Yangtze", "Mississippi"], correct: 1},
+                {question: "How many countries in Africa?", options: ["48", "52", "54", "58"], correct: 2},
+                {question: "What is the largest desert?", options: ["Sahara", "Gobi", "Antarctic Desert", "Arabian"], correct: 2},
+                {question: "Which country has the most islands?", options: ["Indonesia", "Philippines", "Sweden", "Japan"], correct: 2},
+                {question: "What is the capital of Australia?", options: ["Sydney", "Melbourne", "Canberra", "Perth"], correct: 2},
+                {question: "Mount Kilimanjaro is in which country?", options: ["Kenya", "Tanzania", "Uganda", "Ethiopia"], correct: 1},
+                {question: "What is the smallest US state?", options: ["Delaware", "Connecticut", "Rhode Island", "Hawaii"], correct: 2},
+                {question: "Which country has the longest coastline?", options: ["Australia", "Russia", "Canada", "USA"], correct: 2},
+                {question: "What is the capital of Canada?", options: ["Toronto", "Vancouver", "Ottawa", "Montreal"], correct: 2},
+                {question: "The Great Barrier Reef is off the coast of?", options: ["New Zealand", "Australia", "Indonesia", "Philippines"], correct: 1},
+                {question: "What's the largest country by area?", options: ["China", "Canada", "USA", "Russia"], correct: 3},
+                {question: "Which US state is known as the Sunshine State?", options: ["California", "Texas", "Florida", "Hawaii"], correct: 2},
+                {question: "What is the capital of Egypt?", options: ["Alexandria", "Cairo", "Giza", "Luxor"], correct: 1},
+                {question: "How many time zones does Russia have?", options: ["7", "9", "11", "13"], correct: 2}
+            ],
+            movies: [
+                {question: "Who played Iron Man in the Marvel movies?", options: ["Chris Evans", "Chris Hemsworth", "Robert Downey Jr.", "Mark Ruffalo"], correct: 2},
+                {question: "What year was the first Toy Story released?", options: ["1993", "1995", "1997", "1999"], correct: 1},
+                {question: "Which movie won Best Picture in 1994?", options: ["Pulp Fiction", "The Shawshank Redemption", "Forrest Gump", "The Lion King"], correct: 2},
+                {question: "Who directed Jurassic Park?", options: ["James Cameron", "Steven Spielberg", "George Lucas", "Ridley Scott"], correct: 1},
+                {question: "What is the highest-grossing film ever?", options: ["Titanic", "Avatar", "Avengers: Endgame", "Star Wars"], correct: 1},
+                {question: "In Harry Potter, what is Voldemort's real name?", options: ["Tom Riddle", "Severus Snape", "Sirius Black", "Lucius Malfoy"], correct: 0},
+                {question: "Which actor played Batman in The Dark Knight?", options: ["Ben Affleck", "Christian Bale", "Michael Keaton", "George Clooney"], correct: 1},
+                {question: "What movie features the song 'Let It Go'?", options: ["Moana", "Tangled", "Frozen", "Brave"], correct: 2},
+                {question: "Who played Jack in Titanic?", options: ["Brad Pitt", "Leonardo DiCaprio", "Tom Cruise", "Johnny Depp"], correct: 1},
+                {question: "What is the name of the ring in Lord of the Rings?", options: ["The Ring", "The One Ring", "Power Ring", "Master Ring"], correct: 1},
+                {question: "Which movie features a DeLorean time machine?", options: ["Terminator", "Back to the Future", "The Time Machine", "Bill & Ted"], correct: 1},
+                {question: "Who played Forrest Gump?", options: ["Tom Cruise", "Tom Hanks", "Brad Pitt", "Robin Williams"], correct: 1},
+                {question: "What is the name of the AI in 2001: A Space Odyssey?", options: ["HAL 9000", "GLaDOS", "WALL-E", "Skynet"], correct: 0},
+                {question: "Which movie features the quote 'I'll be back'?", options: ["Predator", "Commando", "The Terminator", "Total Recall"], correct: 2},
+                {question: "What movie won Best Picture in 2020?", options: ["1917", "Joker", "Parasite", "Once Upon a Time"], correct: 2}
+            ],
+            entertainment: [
+                {question: "Who sang 'Thriller'?", options: ["Prince", "Michael Jackson", "Whitney Houston", "Stevie Wonder"], correct: 1},
+                {question: "Which band sang 'Bohemian Rhapsody'?", options: ["The Beatles", "Led Zeppelin", "Queen", "Pink Floyd"], correct: 2},
+                {question: "What is Lady Gaga's real first name?", options: ["Stefani", "Stephanie", "Stella", "Sarah"], correct: 0},
+                {question: "Who is known as the King of Pop?", options: ["Elvis Presley", "Prince", "Michael Jackson", "Freddie Mercury"], correct: 2},
+                {question: "Which streaming service created Stranger Things?", options: ["Hulu", "Netflix", "Disney+", "Amazon Prime"], correct: 1},
+                {question: "How many seasons of Game of Thrones are there?", options: ["6", "7", "8", "9"], correct: 2},
+                {question: "Who hosts The Tonight Show?", options: ["Jimmy Fallon", "Jimmy Kimmel", "Stephen Colbert", "James Corden"], correct: 0},
+                {question: "Which K-pop group has a song called 'Dynamite'?", options: ["Blackpink", "EXO", "BTS", "Twice"], correct: 2},
+                {question: "Who played Rachel in Friends?", options: ["Courteney Cox", "Jennifer Aniston", "Lisa Kudrow", "Reese Witherspoon"], correct: 1},
+                {question: "What is the longest-running Broadway show?", options: ["Cats", "Les Misérables", "The Phantom of the Opera", "Chicago"], correct: 2},
+                {question: "Who won American Idol's first season?", options: ["Clay Aiken", "Kelly Clarkson", "Carrie Underwood", "Fantasia"], correct: 1},
+                {question: "Which rapper's real name is Marshall Mathers?", options: ["Snoop Dogg", "Dr. Dre", "Eminem", "50 Cent"], correct: 2},
+                {question: "What year did MTV launch?", options: ["1979", "1981", "1983", "1985"], correct: 1},
+                {question: "Who is the creator of The Simpsons?", options: ["Seth MacFarlane", "Matt Groening", "Trey Parker", "Mike Judge"], correct: 1},
+                {question: "Which Taylor Swift album features 'Shake It Off'?", options: ["Red", "1989", "Reputation", "Lover"], correct: 1}
+            ],
+            colors: [
+                {question: "What color is a ruby?", options: ["Blue", "Red", "Green", "Yellow"], correct: 1},
+                {question: "What color is an emerald?", options: ["Blue", "Red", "Green", "Purple"], correct: 2},
+                {question: "What color is the sun?", options: ["Yellow", "Orange", "White", "Red"], correct: 2},
+                {question: "What color do you get mixing blue and yellow?", options: ["Purple", "Orange", "Green", "Brown"], correct: 2},
+                {question: "What color is a traditional school bus?", options: ["Orange", "Yellow", "Red", "Green"], correct: 1},
+                {question: "What color are Smurfs?", options: ["Green", "Blue", "Purple", "Red"], correct: 1},
+                {question: "What color is the top of a rainbow?", options: ["Red", "Orange", "Yellow", "Violet"], correct: 0},
+                {question: "What color is Barney the dinosaur?", options: ["Green", "Blue", "Purple", "Pink"], correct: 2},
+                {question: "What color do you get mixing red and white?", options: ["Orange", "Pink", "Purple", "Peach"], correct: 1},
+                {question: "What color is SpongeBob?", options: ["Yellow", "Orange", "Tan", "Gold"], correct: 0},
+                {question: "What color are most tennis balls?", options: ["White", "Green", "Yellow", "Orange"], correct: 2},
+                {question: "What color is Donald Duck's hat?", options: ["Red", "Blue", "Yellow", "White"], correct: 1},
+                {question: "What color is the Facebook logo?", options: ["Red", "Blue", "Green", "Purple"], correct: 1},
+                {question: "What color do you get mixing red and blue?", options: ["Orange", "Green", "Purple", "Brown"], correct: 2},
+                {question: "What color is Big Bird from Sesame Street?", options: ["Orange", "Yellow", "White", "Blue"], correct: 1}
+            ],
+            science: [
+                {question: "What planet is known as the Red Planet?", options: ["Venus", "Jupiter", "Mars", "Mercury"], correct: 2},
+                {question: "How many elements in the periodic table?", options: ["98", "108", "118", "128"], correct: 2},
+                {question: "What is the powerhouse of the cell?", options: ["Nucleus", "Mitochondria", "Ribosome", "Chloroplast"], correct: 1},
+                {question: "What gas do plants absorb?", options: ["Oxygen", "Nitrogen", "Carbon dioxide", "Hydrogen"], correct: 2},
+                {question: "How many planets in our solar system?", options: ["7", "8", "9", "10"], correct: 1},
+                {question: "What is the symbol for iron?", options: ["Ir", "In", "Fe", "Fr"], correct: 2},
+                {question: "What is the hardest natural substance?", options: ["Gold", "Iron", "Diamond", "Titanium"], correct: 2},
+                {question: "How many teeth do adult humans have?", options: ["28", "30", "32", "34"], correct: 2},
+                {question: "What is the study of plants called?", options: ["Biology", "Botany", "Zoology", "Ecology"], correct: 1},
+                {question: "What is the chemical formula for water?", options: ["H2O", "CO2", "O2", "H2O2"], correct: 0},
+                {question: "How many chambers in the human heart?", options: ["2", "3", "4", "5"], correct: 2},
+                {question: "What is the smallest unit of life?", options: ["Atom", "Molecule", "Cell", "Organ"], correct: 2},
+                {question: "What is the speed of sound?", options: ["343 m/s", "443 m/s", "543 m/s", "643 m/s"], correct: 0},
+                {question: "What force keeps us on the ground?", options: ["Magnetism", "Gravity", "Friction", "Inertia"], correct: 1},
+                {question: "How many chromosomes do humans have?", options: ["23", "46", "48", "52"], correct: 1}
+            ],
+            history: [
+                {question: "What year did World War I begin?", options: ["1912", "1914", "1916", "1918"], correct: 1},
+                {question: "Who was the first US president?", options: ["Thomas Jefferson", "John Adams", "George Washington", "Benjamin Franklin"], correct: 2},
+                {question: "When did the Berlin Wall fall?", options: ["1987", "1989", "1991", "1993"], correct: 1},
+                {question: "Who discovered America?", options: ["Christopher Columbus", "Amerigo Vespucci", "Leif Erikson", "Ferdinand Magellan"], correct: 0},
+                {question: "What year did the Titanic sink?", options: ["1910", "1912", "1914", "1916"], correct: 1},
+                {question: "Who was the first man on the moon?", options: ["Buzz Aldrin", "Neil Armstrong", "Yuri Gagarin", "John Glenn"], correct: 1},
+                {question: "What ancient wonder still stands today?", options: ["Hanging Gardens", "Colossus", "Great Pyramid of Giza", "Lighthouse"], correct: 2},
+                {question: "Who wrote the Declaration of Independence?", options: ["George Washington", "Benjamin Franklin", "Thomas Jefferson", "John Adams"], correct: 2},
+                {question: "What year did the Soviet Union collapse?", options: ["1989", "1990", "1991", "1992"], correct: 2},
+                {question: "Who was known as the Iron Lady?", options: ["Margaret Thatcher", "Queen Elizabeth", "Indira Gandhi", "Golda Meir"], correct: 0},
+                {question: "What year did World War II end?", options: ["1943", "1944", "1945", "1946"], correct: 2},
+                {question: "Who was the last Pharaoh of Egypt?", options: ["Tutankhamun", "Ramses II", "Cleopatra", "Nefertiti"], correct: 2},
+                {question: "When did the French Revolution begin?", options: ["1776", "1789", "1799", "1804"], correct: 1},
+                {question: "Who invented the printing press?", options: ["Leonardo da Vinci", "Johannes Gutenberg", "Benjamin Franklin", "Thomas Edison"], correct: 1},
+                {question: "What year did man first walk on the moon?", options: ["1967", "1969", "1971", "1973"], correct: 1}
+            ]
+        };
 
         // Dark Solo Questions
         const darkQuestions = {
@@ -851,6 +946,173 @@
             showScreen('quickPlayModeScreen');
         }
 
+        // Helper function to get random questions from a topic
+        function getRandomQuestions(topic, count = 10) {
+            const allQuestions = quickPlayQuestions[topic] || quickPlayQuestions.general;
+            const shuffled = [...allQuestions].sort(() => Math.random() - 0.5);
+            return shuffled.slice(0, Math.min(count, shuffled.length));
+        }
+
+        // Helper function to get topic display name
+        function getTopicDisplayName(topicKey) {
+            const names = {
+                general: "🌍 General Knowledge",
+                sports: "⚽ Sports",
+                geography: "🗺️ Geography",
+                movies: "🎬 Movies & TV",
+                entertainment: "🎭 Entertainment",
+                colors: "🎨 What Color Is It?",
+                science: "🔬 Science",
+                history: "📜 History"
+            };
+            return names[topicKey] || topicKey;
+        }
+
+        function createQuickRoom() {
+            const playerName = document.getElementById('quickPlayerName').value.trim();
+            const topic = document.getElementById('quickTopicSelect').value;
+            const maxPlayers = parseInt(document.getElementById('quickPlayersCount').value);
+
+            if (!playerName) {
+                alert('Please enter your name!');
+                return;
+            }
+
+            gameState.playerName = playerName;
+            gameState.maxPlayers = maxPlayers;
+            gameState.gameCode = generateGameCode();
+            gameState.isQuickPlay = true;
+            gameState.topic = topic;
+            gameState.questions = getRandomQuestions(topic, 10);
+
+            db.ref('games/' + gameState.gameCode).set({
+                host: playerName,
+                topic: topic,
+                maxPlayers: maxPlayers,
+                players: [{name: playerName, score: 0, answers: [], isCreator: true}],
+                questions: gameState.questions,
+                started: false,
+                currentQuestion: 0,
+                isQuickPlay: true,
+                createdAt: Date.now()
+            }).then(() => {
+                document.getElementById('quickGameCode').textContent = gameState.gameCode;
+                document.getElementById('quickTopicDisplay').textContent = getTopicDisplayName(topic);
+                document.getElementById('quickMaxPlayers').textContent = maxPlayers;
+                showScreen('quickLobbyScreen');
+                listenToQuickLobby();
+            }).catch(error => {
+                console.error('Firebase Error:', error);
+                alert('⚠️ Game creation failed! Make sure Firebase is set up correctly.');
+            });
+        }
+
+        function joinQuickRoom() {
+            const playerName = document.getElementById('quickPlayerName').value.trim();
+            const gameCode = document.getElementById('quickJoinCode').value.trim();
+
+            if (!playerName || !gameCode) {
+                alert('Please enter your name and game code!');
+                return;
+            }
+
+            const ref = db.ref('games/' + gameCode);
+            ref.once('value').then((snap) => {
+                const game = snap.val();
+                
+                if (!game) {
+                    alert('Game not found! Check the code.');
+                    return;
+                }
+
+                if ((game.players || []).length >= game.maxPlayers) {
+                    alert('Game is full!');
+                    return;
+                }
+
+                if (game.started) {
+                    alert('Game already started!');
+                    return;
+                }
+
+                if ((game.players || []).some(p => p.name === playerName)) {
+                    alert('Name already taken!');
+                    return;
+                }
+
+                gameState.playerName = playerName;
+                gameState.gameCode = gameCode;
+                gameState.topic = game.topic;
+                gameState.isQuickPlay = true;
+                gameState.questions = game.questions;
+
+                const players = game.players || [];
+                players.push({name: playerName, score: 0, answers: [], isCreator: false});
+
+                ref.update({players}).then(() => {
+                    document.getElementById('quickGameCode').textContent = gameCode;
+                    document.getElementById('quickTopicDisplay').textContent = getTopicDisplayName(game.topic);
+                    document.getElementById('quickMaxPlayers').textContent = game.maxPlayers;
+                    showScreen('quickLobbyScreen');
+                    listenToQuickLobby();
+                });
+            });
+        }
+
+        function listenToQuickLobby() {
+            const ref = db.ref('games/' + gameState.gameCode);
+            const listener = ref.on('value', (snap) => {
+                const game = snap.val();
+                if (!game) return;
+
+                gameState.players = game.players || [];
+                const playerCount = gameState.players.length;
+                
+                document.getElementById('quickPlayerCount').textContent = playerCount;
+                document.getElementById('quickLobbyPlayers').innerHTML = gameState.players.map(p => `
+                    <div class="player-item">
+                        <span class="player-name">🎮 ${p.name} ${p.isCreator ? '👑' : ''}</span>
+                        <span style="color: #43e97b;">✓ Ready</span>
+                    </div>
+                `).join('');
+
+                const isCreator = gameState.players.find(p => p.name === gameState.playerName)?.isCreator;
+                const startBtn = document.getElementById('quickStartBtn');
+                
+                if (playerCount >= 2) {
+                    document.getElementById('quickWaitingMsg').textContent = isCreator 
+                        ? `Everyone's here! Start when ready! (${playerCount}/${gameState.maxPlayers})`
+                        : `Waiting for ${gameState.players.find(p => p.isCreator)?.name || 'creator'} to start... (${playerCount}/${gameState.maxPlayers})`;
+                    
+                    if (isCreator) {
+                        startBtn.style.display = 'block';
+                    }
+                } else {
+                    document.getElementById('quickWaitingMsg').textContent = `Waiting for more players... (${playerCount}/${gameState.maxPlayers})`;
+                    startBtn.style.display = 'none';
+                }
+
+                // If game started, move to game screen
+                if (game.started && game.questions && game.questions.length > 0) {
+                    ref.off('value', listener);
+                    gameState.questions = game.questions;
+                    gameState.currentQuestion = game.currentQuestion || 0;
+                    showPlayerQuestion();
+                }
+            });
+            gameState.listeners.push({ref, listener});
+        }
+
+        function startQuickPlayGame() {
+            db.ref('games/' + gameState.gameCode).update({
+                started: true,
+                currentQuestion: 0
+            }).then(() => {
+                gameState.currentQuestion = 0;
+                showPlayerQuestion();
+            });
+        }
+
         function selectRole(role) {
             if (role === 'solo') {
                 showScreen('soloSetupScreen');
@@ -863,75 +1125,8 @@
             }
         }
 
-        function quickHost() {
-            showScreen('quickHostScreen');
-        }
-
-        function quickJoin() {
-            showScreen('quickJoinScreen');
-        }
-
         function generateGameCode() {
             return Math.floor(100000 + Math.random() * 900000).toString();
-        }
-
-        function createQuickGame() {
-            const hostName = document.getElementById('quickHostName').value.trim();
-            const maxPlayers = parseInt(document.getElementById('quickMaxPlayers').value);
-
-            if (!hostName) {
-                alert('Please enter your name!');
-                return;
-            }
-
-            gameState.hostName = hostName;
-            gameState.maxPlayers = maxPlayers;
-            gameState.gameCode = generateGameCode();
-            gameState.isQuickPlay = true;
-            gameState.questions = generalTriviaQuestions;
-            gameState.topic = "General Trivia";
-
-            db.ref('games/' + gameState.gameCode).set({
-                host: hostName,
-                topic: "General Trivia",
-                maxPlayers: maxPlayers,
-                players: [],
-                questions: generalTriviaQuestions,
-                started: false,
-                currentQuestion: 0,
-                isQuickPlay: true
-            }).then(() => {
-                document.getElementById('displayGameCode').textContent = gameState.gameCode;
-                document.getElementById('displayTopic').textContent = "⚡ General Trivia";
-                document.getElementById('maxPlayerCount').textContent = maxPlayers;
-                document.getElementById('startQuickBtn').style.display = 'block';
-                document.getElementById('startGameBtn').style.display = 'none';
-                showScreen('hostLobbyScreen');
-                listenToLobby();
-            }).catch(error => alert('Error: ' + error.message));
-        }
-
-        function joinQuickGame() {
-            const playerName = document.getElementById('quickPlayerName').value.trim();
-            const gameCode = document.getElementById('quickGameCode').value.trim();
-
-            if (!playerName || !gameCode) {
-                alert('Please fill in all fields!');
-                return;
-            }
-
-            joinGameWithCode(playerName, gameCode);
-        }
-
-        function startQuickGameNow() {
-            // Allow starting with any number of players (including 1 for testing, but button disabled until 2)
-            db.ref('games/' + gameState.gameCode).update({
-                started: true,
-                currentQuestion: 0
-            }).then(() => {
-                gameState.currentQuestion = 0;
-                showHostQuestion();
-            });
         }
 
         function createGame() {
